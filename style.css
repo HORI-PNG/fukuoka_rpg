@@ -1,0 +1,51 @@
+body {
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #333;
+}
+
+#game-container {
+    border: 2px solid #333;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#item-box {
+    width: 800px;
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 5px;
+    box-sizing: border-box; /* paddingを含めてwidthを800pxに保つ */
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 1.2em;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+}
+
+#items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.item {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background-color: #fafafa;
+    font-size: 0.9em;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
