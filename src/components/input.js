@@ -21,4 +21,31 @@ export function initializeInput() {
             keys[e.key] = false;
         }
     });
+
+    const controlMapping = {
+        'btn-up': 'ArrowUp',
+        'btn-down': 'ArrowDown',
+        'btn-left': 'ArrowLeft',
+        'btn-right': 'ArrowRight'
+    };
+
+    for (const [buttonId, key] of Object.entries(controlMapping)) {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            const startMoving = (e) => {
+                e.preventDefault();
+                keys[key] = true;
+            };
+            const stopMoving = (e) => {
+                e.preventDefault();
+                keys[key] = false;
+            };
+
+            btn.addEventListener('mousedown', startMoving);
+            btn.addEventListener('mouseup', stopMoving);
+            btn.addEventListener('mouseleave', stopMoving);
+            btn.addEventListener('touchstart', startMoving);
+            btn.addEventListener('touchend', stopMoving);
+        }
+    }
 }
