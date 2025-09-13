@@ -128,7 +128,7 @@ function checkSpotCollision() {
     });
 }
 
-// ★追加：特殊ステージの条件をチェックする新しい関数
+// 特殊ステージの条件をチェックする新しい関数
 function checkSpecialStageCondition() {
     const requiredItems = 3; // ボタン表示に必要なアイテム数
     const specialStageArea = document.getElementById('special-stage-area');
@@ -148,6 +148,15 @@ function gameLoop() {
     checkSpotCollision();
     checkSpecialStageCondition(); // 特殊ステージの条件をチェック
     requestAnimationFrame(gameLoop);
+}
+
+function toggleItemBox() {
+    const itemBox = document.getElementById('item-box');
+    if (itemBox.style.display === 'block') {
+        itemBox.style.display = 'none';
+    } else {
+        itemBox.style.display = 'block';
+    }
 }
 
 // --- 初期化処理 ---
@@ -218,12 +227,12 @@ function init() {
     // Eキーのイベントリスナー
     document.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 'e') {
-            const itemBox = document.getElementById('item-box');
-            if (itemBox.style.display === 'block') {
-                itemBox.style.display = 'none';
-            } else {
-                itemBox.style.display = 'block';
-            }
+            toggleItemBox();
         }
+
+        const toggleItemsButton = document.getElementById('toggle-items-button');
+        toggleItemsButton.addEventListener('click', () => {
+        toggleItemBox(); // ★同じ共通関数を呼び出す
+        });
     });
 }

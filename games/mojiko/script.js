@@ -1,5 +1,13 @@
 // カードの絵柄（今回は絵文字で代用）
-const cardData = ['🍌', '🍛', '🚂', '🏛️', '🚢', '🌉'];
+const cardData = ['1', '2', '3', '4', '5', '6'];
+// const cardData = [
+//     { id: 'banana', img: './images/banana.png' },
+//     { id: 'curry',  img: './images/curry.png' },
+//     { id: 'train',  img: './images/train.png' },
+//     { id: 'bldg',   img: './images/bldg.png' },
+//     { id: 'ship',   img: './images/ship.png' },
+//     { id: 'bridge', img: './images/bridge.png' }
+// ];
 
 // ゲームボードの要素を取得
 const gameBoard = document.querySelector('.game-board');

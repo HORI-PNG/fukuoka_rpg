@@ -6,7 +6,8 @@ body {
     flex-direction: column;
     background-color: #f0f0f0;
     margin: 0;
-    padding: 20px;
+    padding: 10px;
+    box-sizing: border-box; /* paddingを含めてwidthを100%に保つ */
 }
 
 h1 {
@@ -16,10 +17,13 @@ h1 {
 #game-container {
     border: 2px solid #333;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 100%; /* 横幅を画面サイズに合わせる */
+    max-width: 800px; /* PCなど大きい画面では800px以上にはしない */
 }
 
 #item-box {
-    width: 800px;
+    width: 100%;
+    max-width: 800px;
     margin-top: 20px;
     padding: 10px;
     border: 1px solid #ccc;
@@ -138,4 +142,24 @@ h2 {
 }
 .game-reset-button:hover {
     background-color: #d32f2f;
+}
+
+#game-canvas {
+    width: 100%;
+    height: auto; /* 高さは横幅に合わせて自動調整 */
+    display: block; /* 画像の下にできる余分な隙間を消す */
+}
+
+.ui-button {
+    position: fixed; /* 画面に固定 */
+    bottom: 30px;
+    left: 30px;
+    width: 60px;
+    height: 60px;
+    font-size: 2em;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 2px solid #555;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 100;
 }
