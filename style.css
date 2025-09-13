@@ -104,3 +104,38 @@ h2 {
     border-radius: 10px;
     border: none;
 }
+
+#special-stage-area {
+    margin: 15px 0;
+}
+
+#special-stage-button {
+    padding: 12px 28px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(45deg, #ff00ff, #00ffff);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+#special-stage-button:hover {
+    transform: scale(1.1);
+}
+
+.game-reset-button {
+    display: block;
+    margin: 15px auto;
+    padding: 8px 16px;
+    background-color: #f44336; /* 赤色 */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.game-reset-button:hover {
+    background-color: #d32f2f;
+}

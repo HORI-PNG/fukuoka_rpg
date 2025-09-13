@@ -7,7 +7,7 @@ export const spots = [
         y: 450,
         width: 50,
         height: 50,
-        url: 'https://www.dazaifutenmangu.or.jp/',
+        url: './games/dazaifu/index.html',
         reward: '梅ヶ枝餅'
     },
     {
@@ -16,7 +16,7 @@ export const spots = [
         y: 100,
         width: 50,
         height: 50,
-        url: 'https://example.com/mojiko-minigame',
+        url: './games/mojiko/index.html',
         reward: '焼きカレー'
     },
     {
@@ -25,7 +25,7 @@ export const spots = [
         y: 150,
         width: 50,
         height: 50,
-        url: 'https://www.fukuokatower.co.jp/',
+        url: './games/tower/index.html',
         reward: '明太子'
     },
     {
@@ -34,7 +34,7 @@ export const spots = [
         y: 300,
         width: 50,
         height: 50,
-        url: 'https://canalcity.co.jp/',
+        url: './games/canalcity/index.html',
         reward: 'もつ鍋'
     }
     

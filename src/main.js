@@ -128,6 +128,17 @@ function checkSpotCollision() {
     });
 }
 
+// ★追加：特殊ステージの条件をチェックする新しい関数
+function checkSpecialStageCondition() {
+    const requiredItems = 3; // ボタン表示に必要なアイテム数
+    const specialStageArea = document.getElementById('special-stage-area');
+
+    // プレイヤーの所持アイテム数が条件を満たしたらボタンを表示
+    if (PlayerItems.length >= requiredItems) {
+        specialStageArea.style.display = 'block';
+    }
+}
+
 // --- ゲームのメインループ ---
 function gameLoop() {
     if (gameState === 'playing') {
@@ -135,35 +146,76 @@ function gameLoop() {
     }
     draw();
     checkSpotCollision();
+    checkSpecialStageCondition(); // 特殊ステージの条件をチェック
     requestAnimationFrame(gameLoop);
 }
 
 // --- 初期化処理 ---
 function init() {
+    // 最初に共通の処理を実行
     initializeInput();
     loadItems();
     checkForReward();
 
-    // BGMとスタート画面の処理を追加
+    // HTML要素を取得
     const startScreen = document.getElementById('start-screen');
-    const startButton = document.getElementById('start-button');
     const gameContainer = document.getElementById('game-container');
     const bgm = document.getElementById('bgm');
 
-    startButton.addEventListener('click', () => {
-        // スタート画面を非表示にする
+    // localStorageに'hasPlayedBefore'という記録があるかチェック
+    if (localStorage.getItem('hasPlayedBefore') === 'true') {
+        // 【2回目以降のアクセスの場合】
+        // スタート画面を隠し、ゲーム画面を直接表示
         startScreen.style.display = 'none';
-        // ゲームコンテナを表示する
         gameContainer.style.display = 'block';
 
-        // BGMを再生
-        bgm.play();
+        // BGMは自動再生されない可能性があります
+        // 多くのブラウザでは、ユーザーが最初にクリックしないと音声を再生できません。
+        // そのため、2回目以降はBGMなしで静かにゲームが始まります。
 
-        // ゲームループを開始
-        gameLoop(); 
+        // ゲームループを即座に開始
+        gameLoop();
+
+    } else {
+        // 【初回アクセスの場合】
+        // スタートボタンのクリックを待つ
+        const startButton = document.getElementById('start-button');
+        startButton.addEventListener('click', () => {
+            // クリックされたら、「プレイ済み」の記録をlocalStorageに保存
+            localStorage.setItem('hasPlayedBefore', 'true');
+
+            // スタート画面を隠し、ゲーム画面を表示
+            startScreen.style.display = 'none';
+            gameContainer.style.display = 'block';
+
+            // BGMを再生
+            bgm.play();
+
+            // ゲームループを開始
+            gameLoop();
+        });
+    }
+
+    // ★追加：特殊ステージボタンのクリックイベント
+    const specialStageButton = document.getElementById('special-stage-button');
+    specialStageButton.addEventListener('click', () => {
+        window.location.href = './games/special_stage/index.html';
     });
 
-    // Eキーでアイテムボックスの表示/非表示を切り替える
+    const resetButton = document.getElementById('reset-button');
+    resetButton.addEventListener('click', () => {
+        // 確認ダイアログを表示
+        if (confirm('本当にすべてのデータをリセットして、はじめからやり直しますか？')) {
+            // 保存されているデータを削除
+            localStorage.removeItem('playerItems');
+            localStorage.removeItem('hasPlayedBefore');
+            
+            // ページを再読み込みしてゲームをリスタート
+            window.location.reload();
+        }
+    });
+
+    // Eキーのイベントリスナー
     document.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 'e') {
             const itemBox = document.getElementById('item-box');

@@ -29,9 +29,9 @@ export function initializeInput() {
         'btn-right': 'ArrowRight'
     };
 
-    for (const [buttonId, key] of Object.entries(controlMapping)) {
-        const button = document.getElementById(buttonId);
-        if (button) {
+    for (const [btnId, key] of Object.entries(controlMapping)) {
+        const btn = document.getElementById(btnId);
+        if (btn) {
             const startMoving = (e) => {
                 e.preventDefault();
                 keys[key] = true;
