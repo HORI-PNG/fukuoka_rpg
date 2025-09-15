@@ -1,40 +1,81 @@
-// 各モジュールから必要な変数や関数をインポート
 import { spots } from './data/spots.js';
 import { keys, initializeInput } from './components/input.js';
 import { player, updatePlayerPosition } from './components/player.js';
 
-// --- 初期設定 ---
+// === 設定 ===
+const TILE_SIZE = 1024 / 4;
+const PLAYER_SPRITE_SIZE = 1024 / 4; // キャラクターの1コマのサイズ
+
+// マップ設計図
+// 1. 地面レイヤー
+const baseMapData = [
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 3, 3, 3, 3, 0, 2, 0, 1],
+  [1, 0, 0, 0, 3, 3, 3, 3, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+];
+// 0: 博多ラーメン, 4: 太宰府, 5: 福岡タワー, 12: 門司港レトロ など
+const objectMapData = [
+  [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+  [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+  [-1, -1, -1, -1, -1,  0, -1, -1, -1, -1, -1, -1],
+  [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+  [-1, -1,  4, -1, -1, -1, -1, -1, -1, -1, -1, -1], 
+  [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+  [-1, -1, -1, -1,  5, -1, -1, -1, -1, -1, -1, -1], 
+  [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+  [-1, -1, -1, -1, -1, -1, -1, -1, 12, -1, -1, -1],
+  [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+];
+const TILE_GRASS = 0;
+const TILE_TREE = 1;
+const TILE_ROCK = 2;
+const TILE_SAND = 3;
+
+// === 初期化 ===
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
+const MAP_COLS = baseMapData[0].length;
+const MAP_ROWS = baseMapData.length;
+const VIEWPORT_COLS = 5;
+const VIEWPORT_ROWS = 4;
+canvas.width = VIEWPORT_COLS * TILE_SIZE;
+canvas.height = VIEWPORT_ROWS * TILE_SIZE;
 let PlayerItems = [];
-let gameState = 'playing'; // ゲームの状態を管理 (playing, dialog)
-let ignoredSpot = null;    // 一時的に無視するスポット
 
-// --- 画像の読み込み ---
-const mapImage = new Image();
-const playerImage1 = new Image();
-const playerImage2 = new Image();
-
-// 上記で想定したフォルダ構成に合わせてパスを指定しています
-mapImage.src = './assets/fukuoka_map.png';
-playerImage1.src = './assets/player_icon_1.png';
-playerImage2.src = './assets/player_icon_2.png';
-
+// === 画像読み込み ===
+const tilesetImage = new Image();
+const specialTilesetImage = new Image();
+const playerSpriteImage = new Image();
+tilesetImage.src = './assets/basic_tileset.png';
+specialTilesetImage.src = './assets/special_tileset.png';
+playerSpriteImage.src = './assets/splite.png';
 let imagesLoaded = 0;
-const totalImages = 3; // 読み込む画像は3枚
+const totalImages = 3;
 function onImageLoad() {
     imagesLoaded++;
     if (imagesLoaded === totalImages) {
-        init(); // 
+        init();
     }
 }
-mapImage.onload = onImageLoad;
-playerImage1.onload = onImageLoad;
-playerImage2.onload = onImageLoad;
+tilesetImage.onload = onImageLoad;
+specialTilesetImage.onload = onImageLoad;
+playerSpriteImage.onload = onImageLoad;
 
-// --- UI関連の関数 ---
+// === UI関数 ===
+function toggleItemBox() {
+    const itemBox = document.getElementById('item-box');
+    itemBox.style.display = itemBox.style.display === 'block' ? 'none' : 'block';
+}
 function displayItems() {
     const itemsDiv = document.getElementById('items');
+    if (!itemsDiv) return;
     itemsDiv.innerHTML = '';
     PlayerItems.forEach(item => {
         const itemElement = document.createElement('div');
@@ -43,15 +84,11 @@ function displayItems() {
         itemsDiv.appendChild(itemElement);
     });
 }
-
 function loadItems() {
     const savedItems = localStorage.getItem('playerItems');
-    if (savedItems) {
-        PlayerItems = JSON.parse(savedItems);
-    }
+    if (savedItems) PlayerItems = JSON.parse(savedItems);
     displayItems();
 }
-
 function addItem(itemName) {
     if (!PlayerItems.includes(itemName)) {
         PlayerItems.push(itemName);
@@ -60,7 +97,6 @@ function addItem(itemName) {
         alert(`「${itemName}」を手に入れた！`);
     }
 }
-
 function checkForReward() {
     const urlParams = new URLSearchParams(window.location.search);
     const reward = urlParams.get('reward');
@@ -70,169 +106,121 @@ function checkForReward() {
     }
 }
 
-// --- ゲームロジック関連の関数 ---
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
-
-    spots.forEach(spot => {
-        ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
-        ctx.fillRect(spot.x, spot.y, spot.width, spot.height);
-        ctx.fillStyle = 'black';
-        ctx.font = '12px sans-serif';
-        ctx.fillText(spot.name, spot.x, spot.y - 5);
-    });
-
-    let currentImage;
-    // 移動中はアニメーションフレームに応じて画像を切り替え
-    if (player.isMoving) {
-        currentImage = player.animFrame === 0 ? playerImage1 : playerImage2;
-    } else {
-        // 停止中は1枚目の画像を立ち絵として表示
-        currentImage = playerImage1;
-    }
-
-    ctx.save(); // 現在の描画状態を保存
-    // 左向きの時だけ画像を反転させる
-    if (player.direction === 'left') {
-        ctx.scale(-1, 1); // 左右反転
-        // 反転させた分、描画位置をずらす
-        ctx.drawImage(currentImage, -player.x - player.width, player.y, player.width, player.height);
-    } else {
-        ctx.drawImage(currentImage, player.x, player.y, player.width, player.height);
-    }
-    ctx.restore(); // 描画状態を元に戻す
-}
-
-// checkSpotCollision 関数をまるごとこれに置き換える
-
+// === ゲームロジック ===
 function checkSpotCollision() {
-    spots.forEach(spot => {
-        if (
-            player.x < spot.x + spot.width &&
-            player.x + player.width > spot.x &&
-            player.y < spot.y + spot.height &&
-            player.y + player.height > spot.y
-        ) {
-            if (!sessionStorage.getItem(`visited_${spot.name}`)) {
-                // プレイヤーの動きを止める
-                gameState = 'dialog'; 
-                
-                // 一度訪問したことを記録
-                sessionStorage.setItem(`visited_${spot.name}`, 'true');
-                
-                // 強制的にURLに移動
-                window.location.href = spot.url;
-            }
-        }
-    });
+    if (player.isMoving) return;
+    const spot = spots.find(s => s.x === player.x && s.y === player.y);
+    if (spot && !sessionStorage.getItem(`visited_${spot.name}`)) {
+        sessionStorage.setItem(`visited_${spot.name}`, 'true');
+        window.location.href = spot.url;
+    }
 }
-
-// 特殊ステージの条件をチェックする新しい関数
 function checkSpecialStageCondition() {
-    const requiredItems = 3; // ボタン表示に必要なアイテム数
+    const requiredItems = 3;
     const specialStageArea = document.getElementById('special-stage-area');
-
-    // プレイヤーの所持アイテム数が条件を満たしたらボタンを表示
-    if (PlayerItems.length >= requiredItems) {
+    if (specialStageArea && PlayerItems.length >= requiredItems) {
         specialStageArea.style.display = 'block';
     }
 }
 
-// --- ゲームのメインループ ---
-function gameLoop() {
-    if (gameState === 'playing') {
-        updatePlayerPosition(keys, canvas);
+// === 描画処理 ===
+function draw() {
+    let cameraX = canvas.width / 2 - player.x * TILE_SIZE;
+    let cameraY = canvas.height / 2 - player.y * TILE_SIZE;
+    const minCameraX = canvas.width - (MAP_COLS * TILE_SIZE);
+    cameraX = Math.max(cameraX, minCameraX);
+    cameraX = Math.min(cameraX, 0);
+    const minCameraY = canvas.height - (MAP_ROWS * TILE_SIZE);
+    cameraY = Math.max(cameraY, minCameraY);
+    cameraY = Math.min(cameraY, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(cameraX, cameraY);
+    // 1. 地面レイヤーを描画
+    for (let row = 0; row < MAP_ROWS; row++) {
+        for (let col = 0; col < MAP_COLS; col++) {
+            const tileId = baseMapData[row][col];
+            const sourceX = (tileId % 4) * 256; // TILE_SIZE=256
+            const sourceY = Math.floor(tileId / 4) * 256;
+            ctx.drawImage(
+                tilesetImage, sourceX, sourceY, 256, 256, col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        }
     }
+    
+    // 2. 物体レイヤーを描画
+    for (let row = 0; row < MAP_ROWS; row++) {
+        for (let col = 0; col < MAP_COLS; col++) {
+            const tileId = objectMapData[row][col];
+            if (tileId === -1) continue; // -1なら何もしない
+            const sourceX = (tileId % 4) * 256;
+            const sourceY = Math.floor(tileId / 4) * 256;
+            ctx.drawImage(specialTilesetImage, sourceX, sourceY, 256, 256, col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            
+        }
+    }
+    drawPlayer();
+    ctx.restore();
+}
+function drawPlayer() {
+    const sourceX = player.animFrame * PLAYER_SPRITE_SIZE;
+    const sourceY = player.direction * PLAYER_SPRITE_SIZE;
+    const destX = player.x * TILE_SIZE + (TILE_SIZE - PLAYER_SPRITE_SIZE) / 2;
+    const destY = player.y * TILE_SIZE + (TILE_SIZE - PLAYER_SPRITE_SIZE) / 2;
+    ctx.save();
+    if (keys.ArrowRight && !player.isMoving) {
+        ctx.scale(-1, 1);
+        ctx.drawImage(playerSpriteImage, sourceX, sourceY, PLAYER_SPRITE_SIZE, PLAYER_SPRITE_SIZE, -destX - PLAYER_SPRITE_SIZE, destY, PLAYER_SPRITE_SIZE, PLAYER_SPRITE_SIZE);
+    } else {
+        ctx.drawImage(playerSpriteImage, sourceX, sourceY, PLAYER_SPRITE_SIZE, PLAYER_SPRITE_SIZE, destX, destY, PLAYER_SPRITE_SIZE, PLAYER_SPRITE_SIZE);
+    }
+    ctx.restore();
+}
+
+// === ゲームループ ===
+function gameLoop() {
+    updatePlayerPosition(keys, baseMapData);
     draw();
     checkSpotCollision();
-    checkSpecialStageCondition(); // 特殊ステージの条件をチェック
+    checkSpecialStageCondition();
     requestAnimationFrame(gameLoop);
 }
 
-function toggleItemBox() {
-    const itemBox = document.getElementById('item-box');
-    if (itemBox.style.display === 'block') {
-        itemBox.style.display = 'none';
-    } else {
-        itemBox.style.display = 'block';
-    }
-}
-
-// --- 初期化処理 ---
+// === 初期化処理 ===
 function init() {
-    // 最初に共通の処理を実行
-    initializeInput();
-    loadItems();
-    checkForReward();
+    initializeInput(); loadItems(); checkForReward();
+    // イベントリスナー
+    document.getElementById('special-stage-button')?.addEventListener('click', () => { window.location.href = './games/special_stage/index.html'; });
+    document.getElementById('reset-button')?.addEventListener('click', () => { if (confirm('リセットしますか？')) { localStorage.clear(); window.location.reload(); } });
+    document.getElementById('toggle-items-button')?.addEventListener('click', toggleItemBox);
+    document.addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'e') toggleItemBox(); });
+    
+    const bgmToggleButton = document.getElementById('bgm-toggle-button');
+    const bgm = document.getElementById('bgm');
+    if (bgm) bgm.volume = 0.2;
+    if (bgmToggleButton && bgm) {
+        bgmToggleButton.textContent = bgm.muted ? '🔇' : '🔊';
+        bgmToggleButton.addEventListener('click', () => {
+            bgm.muted = !bgm.muted;
+            bgmToggleButton.textContent = bgm.muted ? '🔇' : '🔊';
+        });
+    }
 
-    // HTML要素を取得
+    // 画面表示の分岐
     const startScreen = document.getElementById('start-screen');
     const gameContainer = document.getElementById('game-container');
-    const bgm = document.getElementById('bgm');
-
-    // localStorageに'hasPlayedBefore'という記録があるかチェック
     if (localStorage.getItem('hasPlayedBefore') === 'true') {
-        // 【2回目以降のアクセスの場合】
-        // スタート画面を隠し、ゲーム画面を直接表示
         startScreen.style.display = 'none';
         gameContainer.style.display = 'block';
-
-        // BGMは自動再生されない可能性があります
-        // 多くのブラウザでは、ユーザーが最初にクリックしないと音声を再生できません。
-        // そのため、2回目以降はBGMなしで静かにゲームが始まります。
-
-        // ゲームループを即座に開始
         gameLoop();
-
     } else {
-        // 【初回アクセスの場合】
-        // スタートボタンのクリックを待つ
+        startScreen.style.display = 'flex';
         const startButton = document.getElementById('start-button');
         startButton.addEventListener('click', () => {
-            // クリックされたら、「プレイ済み」の記録をlocalStorageに保存
             localStorage.setItem('hasPlayedBefore', 'true');
-
-            // スタート画面を隠し、ゲーム画面を表示
             startScreen.style.display = 'none';
             gameContainer.style.display = 'block';
-
-            // BGMを再生
-            bgm.play();
-
-            // ゲームループを開始
+            if(bgm) bgm.play();
             gameLoop();
-        });
+        }, { once: true });
     }
-
-    // ★追加：特殊ステージボタンのクリックイベント
-    const specialStageButton = document.getElementById('special-stage-button');
-    specialStageButton.addEventListener('click', () => {
-        window.location.href = './games/special_stage/index.html';
-    });
-
-    const resetButton = document.getElementById('reset-button');
-    resetButton.addEventListener('click', () => {
-        // 確認ダイアログを表示
-        if (confirm('本当にすべてのデータをリセットして、はじめからやり直しますか？')) {
-            // 保存されているデータを削除
-            localStorage.removeItem('playerItems');
-            localStorage.removeItem('hasPlayedBefore');
-            
-            // ページを再読み込みしてゲームをリスタート
-            window.location.reload();
-        }
-    });
-
-    // Eキーのイベントリスナー
-    document.addEventListener('keydown', (e) => {
-        if (e.key.toLowerCase() === 'e') {
-            toggleItemBox();
-        }
-
-        const toggleItemsButton = document.getElementById('toggle-items-button');
-        toggleItemsButton.addEventListener('click', () => {
-        toggleItemBox(); // ★同じ共通関数を呼び出す
-        });
-    });
 }

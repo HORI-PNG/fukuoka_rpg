@@ -4,162 +4,76 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    background-color: #f0f0f0;
+    background-color: #e0f7fa;
     margin: 0;
     padding: 10px;
-    box-sizing: border-box; /* paddingを含めてwidthを100%に保つ */
+    box-sizing: border-box;
 }
 
 h1 {
-    color: #333;
+    color: #004d40;
+}
+
+canvas {
+    border: 2px solid #333;
+    background-color: #000;
 }
 
 #game-container {
-    border: 2px solid #333;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    width: 100%; /* 横幅を画面サイズに合わせる */
-    max-width: 800px; /* PCなど大きい画面では800px以上にはしない */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* --- UI要素のスタイル --- */
+#start-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 200;
+}
+#start-button { padding: 20px 40px; font-size: 2em; cursor: pointer; }
+
+#special-stage-area { margin: 15px 0; }
+#special-stage-button {
+    padding: 12px 28px; font-size: 1.5em; font-weight: bold; color: white;
+    background: linear-gradient(45deg, #ff00ff, #00ffff);
+    border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+#reset-button {
+    margin: 15px auto; padding: 8px 16px; background-color: #f44336;
+    color: white; border: none; border-radius: 5px; cursor: pointer;
 }
 
 #item-box {
-    width: 100%;
-    max-width: 800px;
-    margin-top: 20px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    border-radius: 5px;
-    box-sizing: border-box; /* paddingを含めてwidthを800pxに保つ */
-    display: none; /* 初期状態では非表示 */
+    width: 100%; max-width: 384px; margin-top: 10px; padding: 10px;
+    border: 1px solid #ccc; background-color: #fff; border-radius: 5px;
+    box-sizing: border-box; display: none;
 }
+#items { display: flex; flex-wrap: wrap; gap: 5px; }
+.item { padding: 5px; background-color: #f0f0f0; border-radius: 3px; }
 
-h2 {
-    margin-top: 0;
-    font-size: 1.2em;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 5px;
+#toggle-items-button {
+    position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px;
+    font-size: 2em; background-color: rgba(255, 255, 255, 0.8);
+    border: 2px solid #555; border-radius: 50%; cursor: pointer; z-index: 100;
 }
-
-#items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.item {
-    border: 1px solid #ddd;
-    padding: 8px 12px;
-    border-radius: 20px;
-    background-color: #fafafa;
-    font-size: 0.9em;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
 
 #controls {
-    position: fixed; /* 画面に固定 */
-    bottom: 30px;
-    right: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    z-index: 100; /* ゲーム画面より手前に表示 */
+    position: fixed; bottom: 30px; right: 30px; display: flex;
+    flex-direction: column; align-items: center; gap: 5px; z-index: 100;
 }
-
-#controls .middle-row {
-    display: flex;
-    gap: 60px; /* 左右ボタンの間隔 */
-}
-
+#controls .middle-row { display: flex; gap: 60px; }
 #controls button {
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
-    color: #333;
-    background-color: rgba(255, 255, 255, 0.7);
-    border: 2px solid #555;
-    border-radius: 50%; /* 丸いボタンにする */
-    cursor: pointer;
-    user-select: none; /* テキスト選択を防ぐ */
+    width: 50px; height: 50px; font-size: 24px; color: #333;
+    background-color: rgba(255, 255, 255, 0.7); border: 2px solid #555;
+    border-radius: 50%; cursor: pointer; user-select: none;
 }
 
-#controls button:active {
-    background-color: rgba(200, 200, 200, 0.9); /* 押したときの色 */
-}
-
-#start-screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 200; /* 他の要素より手前に表示 */
-}
-
-#start-button {
-    padding: 20px 40px;
-    font-size: 2em;
-    cursor: pointer;
-    border-radius: 10px;
-    border: none;
-}
-
-#special-stage-area {
-    margin: 15px 0;
-}
-
-#special-stage-button {
-    padding: 12px 28px;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: white;
-    background: linear-gradient(45deg, #ff00ff, #00ffff);
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s;
-}
-
-#special-stage-button:hover {
-    transform: scale(1.1);
-}
-
-.game-reset-button {
-    display: block;
-    margin: 15px auto;
-    padding: 8px 16px;
-    background-color: #f44336; /* 赤色 */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.game-reset-button:hover {
-    background-color: #d32f2f;
-}
-
-#game-canvas {
-    width: 100%;
-    height: auto; /* 高さは横幅に合わせて自動調整 */
-    display: block; /* 画像の下にできる余分な隙間を消す */
-}
-
-.ui-button {
-    position: fixed; /* 画面に固定 */
-    bottom: 30px;
-    left: 30px;
-    width: 60px;
-    height: 60px;
-    font-size: 2em;
-    background-color: rgba(255, 255, 255, 0.8);
-    border: 2px solid #555;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 100;
+#bgm-toggle-button {
+    /* 画面の右上に配置 */
+    top: 30px;
+    right: 30px;
+    /* bottom, left の指定を上書き */
+    bottom: auto;
+    left: auto;
 }

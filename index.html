@@ -14,28 +14,19 @@
     </div>
 
     <div id="game-container" style="display: none;">
-        <canvas id="game-canvas" width="800" height="600"></canvas>
+        <canvas id="game-canvas"></canvas>
     </div>
 
     <div id="special-stage-area" style="text-align: center; display: none;">
         <button id="special-stage-button">✨ ？？？ ✨</button>
     </div>
-
     <button id="reset-button" class="game-reset-button">はじめからやり直す</button>
-
     <div id="item-box">
         <h2>手に入れた特産品</h2>
         <div id="items"></div>
     </div>
-
-    <audio id="bgm" src="./assets/bgm.mp3" loop></audio>
-
-    <script type="module" src="src/main.js"></script>
-
+    <button id="bgm-toggle-button" class="ui-button">🔊</button>
     <button id="toggle-items-button" class="ui-button">🎒</button>
-
-    <script type="module" src="src/main.js"></script>
-    
     <div id="controls">
         <button id="btn-up">▲</button>
         <div class="middle-row">
@@ -44,5 +35,9 @@
         </div>
         <button id="btn-down">▼</button>
     </div>
+
+    <audio id="bgm" src="./assets/bgm.mp3" loop></audio>
+    
+    <script type="module" src="src/main.js"></script>
 </body>
 </html>

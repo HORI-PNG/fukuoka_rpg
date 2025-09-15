@@ -1,49 +1,53 @@
-// プレイヤーの初期データ
+// 通行不可タイル
+const COLLISION_TILES = [1, 2];
+
 export const player = {
-    x: 400,
-    y: 300,
-    width: 32,
-    height: 32,
-    speed: 3,
-    direction: 'right', // 初期方向
-    isMoving: false, // 移動中かどうか
-    animFrame: 0, // アニメーションフレーム
-    animTimer: 0, // アニメーションタイマー
-    animSpeed: 30 // アニメーション速度
+    x: 1, y: 1,
+    direction: 0,   // 0:下, 1:上, 2:左
+    animFrame: 1,   // 0:左足, 1:静止, 2:右足
+    isMoving: false,
 };
 
-// プレイヤーの位置を更新する関数
-// どのキーが押されているか(keys)と、canvasの情報を引数で受け取る
-export function updatePlayerPosition(keys, canvas) {
-    player.isMoving = false; // 毎フレーム移動フラグをリセット
+export function updatePlayerPosition(keys, mapData) {
+    if (player.isMoving) return;
 
-    if (keys.ArrowUp && player.y > 0) {
-        player.y -= player.speed;
-        player.isMoving = true;
-    }
-    if (keys.ArrowDown && player.y < canvas.height - player.height) {
-        player.y += player.speed;
-        player.isMoving = true;
-    }
-    if (keys.ArrowLeft && player.x > 0) {
-        player.x -= player.speed;
-        player.direction = 'left'; // 左向きに変更
-        player.isMoving = true;
-    }
-    if (keys.ArrowRight && player.x < canvas.width - player.width) {
-        player.x += player.speed;
-        player.direction = 'right'; // 右向きに変更
-        player.isMoving = true;
+    let targetX = player.x;
+    let targetY = player.y;
+    let moved = false;
+
+    if (keys.ArrowUp) {
+        player.direction = 1;
+        targetY--;
+        moved = true;
+    } else if (keys.ArrowDown) {
+        player.direction = 0;
+        targetY++;
+        moved = true;
+    } else if (keys.ArrowLeft) {
+        player.direction = 2;
+        targetX--;
+        moved = true;
+    } else if (keys.ArrowRight) {
+        player.direction = 2; // 右向きは左を反転して使う
+        targetX++;
+        moved = true;
     }
 
-    // 移動中はアニメーションタイマーを進める
-    if (player.isMoving) {
-        player.animTimer++;
-        if (player.animTimer >= player.animSpeed) {
-            player.aniumTimer = 0;
-            player.animFrame = (player.animFrame + 1) % 2; // フレームを進める
+    if (moved) {
+        player.isMoving = true;
+        
+        // 衝突判定
+        if (!COLLISION_TILES.includes(mapData[targetY][targetX])) {
+            player.x = targetX;
+            player.y = targetY;
         }
-    } else {
-        player.animFrame = 0; // 止まっているときはフレームをリセット
+
+        // アニメーション
+        player.animFrame = player.animFrame === 0 ? 2 : 0;
+        
+        setTimeout(() => {
+            player.isMoving = false;
+            player.animFrame = 1;
+        }, 200);
     }
 }
