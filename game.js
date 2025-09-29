@@ -52,8 +52,8 @@ window.addEventListener('load', () => {
         gameContainer.style.display = 'block';
         document.getElementById('game-info').style.display = 'block';
         
-        // BGM再生
-        if (bgm) bgm.play();
+        // BGM再生（うるさいのでコメントアウト）
+        // if (bgm) bgm.play();
     });
 
     // アイテムボックスの表示切り替え
