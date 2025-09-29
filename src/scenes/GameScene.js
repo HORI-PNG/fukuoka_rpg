@@ -7,36 +7,34 @@ export class GameScene extends Phaser.Scene {
 
     preload() {
         this.load.image('map', './assets/fukuoka_map_1.png');
-        // 新しいプレイヤー画像（剣を持っている方）に変更
-        this.load.image('player', './assets/player_icon_3.png'); 
+        this.load.image('player', './assets/player_icon_3_shadow.png'); // 影付きのジャンプ画像に変更
     }
 
     create() {
-        // ▼▼▼ アイテムの初期ロードと表示 ▼▼▼
         this.loadItems();
         this.updateItemBox();
-
-        // 背景画像
         this.add.image(400, 300, 'map');
 
-        // 観光スポット
+        // 観光スポットの当たり判定エリアを作成
         this.spotObjects = this.physics.add.staticGroup();
         spots.forEach(spot => {
             const spotObject = this.spotObjects.create(spot.x + spot.width / 2, spot.y + spot.height / 2, null)
                 .setSize(spot.width, spot.height)
                 .setVisible(false);
-            spotObject.name = spot.name;
-            spotObject.reward = spot.reward;
+            
+            // ★重要：当たり判定オブジェクトに、スポット名と報酬のデータを格納します
+            spotObject.setData('name', spot.name);
+            spotObject.setData('reward', spot.reward);
         });
 
-        // プレイヤー
+        // プレイヤーを作成
         this.player = this.physics.add.sprite(400, 300, 'player');
         this.player.setCollideWorldBounds(true);
 
-        // キーボード入力
+        // キーボード入力を設定
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        // 当たり判定
+        // プレイヤーとスポットが重なったら onSpotOverlap 関数を呼び出すように設定
         this.physics.add.overlap(this.player, this.spotObjects, this.onSpotOverlap, null, this);
     }
 
@@ -46,10 +44,10 @@ export class GameScene extends Phaser.Scene {
 
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-speed);
-            this.player.setFlipX(true); // 左向きに反転
+            this.player.setFlipX(true);
         } else if (this.cursors.right.isDown) {
             this.player.setVelocityX(speed);
-            this.player.setFlipX(false); // 右向き（通常）
+            this.player.setFlipX(false);
         }
 
         if (this.cursors.up.isDown) {
@@ -59,20 +57,32 @@ export class GameScene extends Phaser.Scene {
         }
     }
 
-    // スポットに重なった時の処理
+    /**
+     * スポットに重なった（入った）ときに呼び出される関数
+     * @param {Phaser.GameObjects.Sprite} player - プレイヤーオブジェクト
+     * @param {Phaser.GameObjects.Sprite} spot - 重なったスポットの当たり判定オブジェクト
+     */
     onSpotOverlap(player, spot) {
-        if (!sessionStorage.getItem(`visited_${spot.name}`)) {
-            sessionStorage.setItem(`visited_${spot.name}`, 'true');
+        // スポットオブジェクトからスポット名と報酬を取得
+        const spotName = spot.getData('name');
+        const reward = spot.getData('reward');
+
+        // まだ訪れていなければクイズを開始
+        if (!sessionStorage.getItem(`visited_${spotName}`)) {
+            sessionStorage.setItem(`visited_${spotName}`, 'true');
             
-            this.scene.pause();
+            // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+            // ここでクイズシーンを起動しています！
+            // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+            this.scene.pause(); // メインゲームを一時停止
             this.scene.launch('QuizScene', {
-                spotName: spot.name,
-                reward: spot.reward
+                spotName: spotName,
+                reward: reward
             });
         }
     }
 
-    // --- 以下、アイテム管理用の関数 ---
+    // --- 以下、アイテム管理用の関数 (変更なし) ---
     loadItems() {
         const savedItems = localStorage.getItem('playerItems');
         if (savedItems) {
@@ -83,6 +93,9 @@ export class GameScene extends Phaser.Scene {
     }
 
     addItem(itemName) {
+        if (!window.PlayerItems) {
+            window.PlayerItems = [];
+        }
         if (!window.PlayerItems.includes(itemName)) {
             window.PlayerItems.push(itemName);
             localStorage.setItem('playerItems', JSON.stringify(window.PlayerItems));
