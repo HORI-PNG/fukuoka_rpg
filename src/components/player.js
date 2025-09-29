@@ -9,9 +9,8 @@ export const player = {
     isMoving: false, // 移動中かどうか
     animFrame: 0, // アニメーションフレーム
     animTimer: 0, // アニメーションタイマー
-    animSpeed: 30 // アニメーション速度
+    animSpeed: 20 // アニメーション速度
 };
-
 // プレイヤーの位置を更新する関数
 // どのキーが押されているか(keys)と、canvasの情報を引数で受け取る
 export function updatePlayerPosition(keys, canvas) {

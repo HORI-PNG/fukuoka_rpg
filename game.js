@@ -175,5 +175,5 @@ function onImageLoad() {
 mapImage.onload = onImageLoad;
 playerImage.onload = onImageLoad;
 
-mapImage.src = 'fukuoka_map.png';
+mapImage.src = 'fukuoka_map_1.png';
 playerImage.src = 'player_icon.png';

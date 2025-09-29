@@ -41,11 +41,11 @@ export function initializeInput() {
                 keys[key] = false;
             };
 
-            btn.addEventListener('mousedown', startMoving);
-            btn.addEventListener('mouseup', stopMoving);
-            btn.addEventListener('mouseleave', stopMoving);
-            btn.addEventListener('touchstart', startMoving);
-            btn.addEventListener('touchend', stopMoving);
+            button.addEventListener('mousedown', startMoving);
+            button.addEventListener('mouseup', stopMoving);
+            button.addEventListener('mouseleave', stopMoving);
+            button.addEventListener('touchstart', startMoving);
+            button.addEventListener('touchend', stopMoving);
         }
     }
 }
