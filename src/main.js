@@ -3,11 +3,19 @@ import { keys, initializeInput } from './components/input.js';
 import { player, updatePlayerPosition } from './components/player.js';
 
 // === 設定 ===
-const TILE_SIZE = 1024 / 4;
-const PLAYER_SPRITE_SIZE = 1024 / 4; // キャラクターの1コマのサイズ
+const TILE_SIZE = 256;
+const PLAYER_SPRITE_SIZE = 256;
+
+const TILE_GRASS = 0;
+const TILE_TREE = 1;
+const TILE_ROCK = 2;
+const TILE_SAND = 3;
+const TILE_SEA = 8; // basic_tileset.png の水のタイルID
+
+// ★通行不可タイルをここで定義
+const COLLISION_TILES = [TILE_TREE, TILE_ROCK, TILE_SEA];
 
 // マップ設計図
-// 1. 地面レイヤー
 const baseMapData = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -20,7 +28,8 @@ const baseMapData = [
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
-// 0: 博多ラーメン, 4: 太宰府, 5: 福岡タワー, 12: 門司港レトロ など
+let dynamicMapData = JSON.parse(JSON.stringify(baseMapData));
+
 const objectMapData = [
   [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
   [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
@@ -33,20 +42,25 @@ const objectMapData = [
   [-1, -1, -1, -1, -1, -1, -1, -1, 12, -1, -1, -1],
   [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
 ];
-const TILE_GRASS = 0;
-const TILE_TREE = 1;
-const TILE_ROCK = 2;
-const TILE_SAND = 3;
 
 // === 初期化 ===
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
+const minimapCanvas = document.getElementById('minimap-canvas');
+const minimapCtx = minimapCanvas.getContext('2d');
+const stepCounterElement = document.getElementById('step-counter');
+
 const MAP_COLS = baseMapData[0].length;
 const MAP_ROWS = baseMapData.length;
-const VIEWPORT_COLS = 5;
-const VIEWPORT_ROWS = 4;
+const VIEWPORT_COLS = 10;
+const VIEWPORT_ROWS = 10;
 canvas.width = VIEWPORT_COLS * TILE_SIZE;
 canvas.height = VIEWPORT_ROWS * TILE_SIZE;
+
+const MINIMAP_TILE_SIZE = 10;
+minimapCanvas.width = MAP_COLS * MINIMAP_TILE_SIZE;
+minimapCanvas.height = MAP_ROWS * MINIMAP_TILE_SIZE;
+
 let PlayerItems = [];
 
 // === 画像読み込み ===
@@ -84,10 +98,13 @@ function displayItems() {
         itemsDiv.appendChild(itemElement);
     });
 }
-function loadItems() {
+function loadGameData() {
     const savedItems = localStorage.getItem('playerItems');
     if (savedItems) PlayerItems = JSON.parse(savedItems);
     displayItems();
+    
+    const savedSteps = localStorage.getItem('playerSteps');
+    if (savedSteps) player.steps = parseInt(savedSteps, 10);
 }
 function addItem(itemName) {
     if (!PlayerItems.includes(itemName)) {
@@ -123,6 +140,34 @@ function checkSpecialStageCondition() {
     }
 }
 
+let mapChanged = false;
+function checkMapUpdate() {
+    if (player.steps >= 30 && !mapChanged) {
+        updateMapToSea();
+        mapChanged = true;
+
+        if (dynamicMapData[player.y][player.x] === TILE_SEA) {
+            alert('うわっ！潮が満ちてきた！流されてしまった...');
+            player.x = 1;
+            player.y = 1;
+        }
+    }
+}
+
+function updateMapToSea() {
+    const changeCoordinates = [
+        { y: 1, x: 5 }, { y: 1, x: 6 },
+        { y: 4, x: 7 }, { y: 4, x: 8 },
+        { y: 7, x: 3 }, { y: 8, x: 3 }, { y: 8, x: 4 },
+    ];
+
+    changeCoordinates.forEach(coord => {
+        if (dynamicMapData[coord.y][coord.x] === TILE_GRASS) {
+            dynamicMapData[coord.y][coord.x] = TILE_SEA;
+        }
+    });
+}
+
 // === 描画処理 ===
 function draw() {
     let cameraX = canvas.width / 2 - player.x * TILE_SIZE;
@@ -136,22 +181,21 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.translate(cameraX, cameraY);
-    // 1. 地面レイヤーを描画
+
     for (let row = 0; row < MAP_ROWS; row++) {
         for (let col = 0; col < MAP_COLS; col++) {
-            const tileId = baseMapData[row][col];
-            const sourceX = (tileId % 4) * 256; // TILE_SIZE=256
+            const tileId = dynamicMapData[row][col];
+            const sourceX = (tileId % 4) * 256;
             const sourceY = Math.floor(tileId / 4) * 256;
             ctx.drawImage(
                 tilesetImage, sourceX, sourceY, 256, 256, col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
     }
     
-    // 2. 物体レイヤーを描画
     for (let row = 0; row < MAP_ROWS; row++) {
         for (let col = 0; col < MAP_COLS; col++) {
             const tileId = objectMapData[row][col];
-            if (tileId === -1) continue; // -1なら何もしない
+            if (tileId === -1) continue;
             const sourceX = (tileId % 4) * 256;
             const sourceY = Math.floor(tileId / 4) * 256;
             ctx.drawImage(specialTilesetImage, sourceX, sourceY, 256, 256, col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -161,6 +205,7 @@ function draw() {
     drawPlayer();
     ctx.restore();
 }
+
 function drawPlayer() {
     const sourceX = player.animFrame * PLAYER_SPRITE_SIZE;
     const sourceY = player.direction * PLAYER_SPRITE_SIZE;
@@ -176,10 +221,39 @@ function drawPlayer() {
     ctx.restore();
 }
 
+function drawMinimap() {
+    for (let row = 0; row < MAP_ROWS; row++) {
+        for (let col = 0; col < MAP_COLS; col++) {
+            const tileId = dynamicMapData[row][col];
+            switch(tileId) {
+                case TILE_GRASS: minimapCtx.fillStyle = 'green'; break;
+                case TILE_TREE: minimapCtx.fillStyle = 'darkgreen'; break;
+                case TILE_ROCK: minimapCtx.fillStyle = 'gray'; break;
+                case TILE_SAND: minimapCtx.fillStyle = 'yellow'; break;
+                case TILE_SEA: minimapCtx.fillStyle = 'blue'; break;
+                default: minimapCtx.fillStyle = 'black';
+            }
+            minimapCtx.fillRect(col * MINIMAP_TILE_SIZE, row * MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE);
+        }
+    }
+    drawMinimapPlayer();
+}
+
+function drawMinimapPlayer() {
+    minimapCtx.fillStyle = 'red';
+    minimapCtx.fillRect(player.x * MINIMAP_TILE_SIZE, player.y * MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE);
+}
+
+
 // === ゲームループ ===
 function gameLoop() {
-    updatePlayerPosition(keys, baseMapData);
+    // ★COLLISION_TILES を引数として渡す
+    updatePlayerPosition(keys, dynamicMapData, COLLISION_TILES);
     draw();
+    drawMinimap();
+    stepCounterElement.textContent = player.steps;
+    
+    checkMapUpdate();
     checkSpotCollision();
     checkSpecialStageCondition();
     requestAnimationFrame(gameLoop);
@@ -187,8 +261,9 @@ function gameLoop() {
 
 // === 初期化処理 ===
 function init() {
-    initializeInput(); loadItems(); checkForReward();
-    // イベントリスナー
+    initializeInput(); 
+    loadGameData(); 
+    checkForReward();
     document.getElementById('special-stage-button')?.addEventListener('click', () => { window.location.href = './games/special_stage/index.html'; });
     document.getElementById('reset-button')?.addEventListener('click', () => { if (confirm('リセットしますか？')) { localStorage.clear(); window.location.reload(); } });
     document.getElementById('toggle-items-button')?.addEventListener('click', toggleItemBox);
@@ -205,7 +280,6 @@ function init() {
         });
     }
 
-    // 画面表示の分岐
     const startScreen = document.getElementById('start-screen');
     const gameContainer = document.getElementById('game-container');
     if (localStorage.getItem('hasPlayedBefore') === 'true') {

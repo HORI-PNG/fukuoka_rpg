@@ -23,6 +23,15 @@ canvas {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+#minimap-canvas {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 2px solid #fff;
+    background-color: #000;
+    z-index: 100;
+}
+
 /* --- UI要素のスタイル --- */
 #start-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -39,8 +48,17 @@ canvas {
     border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
+#stats-box {
+    margin-top: 15px;
+    padding: 8px 16px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1.1em;
+}
+
 #reset-button {
-    margin: 15px auto; padding: 8px 16px; background-color: #f44336;
+    margin: 10px auto; padding: 8px 16px; background-color: #f44336;
     color: white; border: none; border-radius: 5px; cursor: pointer;
 }
 

@@ -1,14 +1,15 @@
-// 通行不可タイル
-const COLLISION_TILES = [1, 2];
+// 通行不可タイルの定義を削除
 
 export const player = {
     x: 1, y: 1,
     direction: 0,   // 0:下, 1:上, 2:左
     animFrame: 1,   // 0:左足, 1:静止, 2:右足
     isMoving: false,
+    steps: 0,
 };
 
-export function updatePlayerPosition(keys, mapData) {
+// updatePlayerPosition の引数に COLLISION_TILES を追加
+export function updatePlayerPosition(keys, dynamicMapData, COLLISION_TILES) {
     if (player.isMoving) return;
 
     let targetX = player.x;
@@ -36,10 +37,12 @@ export function updatePlayerPosition(keys, mapData) {
     if (moved) {
         player.isMoving = true;
         
-        // 衝突判定
-        if (!COLLISION_TILES.includes(mapData[targetY][targetX])) {
+        // 衝突判定に引数の COLLISION_TILES を使用
+        if (!COLLISION_TILES.includes(dynamicMapData[targetY][targetX])) {
             player.x = targetX;
             player.y = targetY;
+            player.steps++;
+            localStorage.setItem('playerSteps', player.steps.toString());
         }
 
         // アニメーション

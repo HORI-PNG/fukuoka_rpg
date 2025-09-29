@@ -13,12 +13,16 @@
         <button id="start-button">ゲームを開始する</button>
     </div>
 
-    <div id="game-container" style="display: none;">
+    <div id="game-container" style="display: none; position: relative;">
         <canvas id="game-canvas"></canvas>
+        <canvas id="minimap-canvas"></canvas>
     </div>
 
     <div id="special-stage-area" style="text-align: center; display: none;">
         <button id="special-stage-button">✨ ？？？ ✨</button>
+    </div>
+    <div id="stats-box">
+        歩数: <span id="step-counter">0</span>歩
     </div>
     <button id="reset-button" class="game-reset-button">はじめからやり直す</button>
     <div id="item-box">

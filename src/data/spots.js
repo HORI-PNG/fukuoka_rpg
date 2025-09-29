@@ -1,16 +1,23 @@
 export const spots = [
     {
-        name: '岩', // 以前の太宰府天満宮の代わり
-        x: 2, // マス目のX座標
-        y: 2, // マス目のY座標
+        name: '太宰府天満宮',
+        x: 2, 
+        y: 4, 
         url: './games/dazaifu/index.html',
         reward: '梅ヶ枝餅'
     },
     {
-        name: '砂地', // 以前の門司港レトロの代わり
-        x: 3,
-        y: 1,
+        name: '門司港レトロ',
+        x: 8,
+        y: 8,
         url: './games/mojiko/index.html',
         reward: '焼きカレー'
+    },
+    {
+        name: '櫛田神社', // 「福岡タワー」から変更
+        x: 4,
+        y: 6,
+        url: './games/yamakasa/index.html', // 新しいゲームのパス
+        reward: '手ぬぐい' // 新しい報酬
     }
 ];
