@@ -29,7 +29,15 @@ export const quizzes = {
         choices: ["A", "B", "C", "正解"],
         correctAnswer: "正解"
     },
-    'エレン': {
+    'PayPayドーム': {
+        question: "エレンは〇ぬ？",
+        choices: [
+            "はい",
+            "いいえ"
+        ],
+        correctAnswer: "はい"
+    },
+    '中州屋台': {
         question: "エレンは〇ぬ？",
         choices: [
             "はい",

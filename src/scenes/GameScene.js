@@ -8,18 +8,14 @@ export class GameScene extends Phaser.Scene {
 
     preload() {
         this.load.image('map', './assets/fukuoka_map_1.png');
-        
-        // アニメーションに使う2枚の画像を個別に読み込みます
         this.load.image('player_stand', './assets/player_icon_1_shadow.png');
         this.load.image('player_walk', './assets/player_icon_2_shadow.png');
     }
 
     create() {
-        // --- 背景の作成 ---
         const map = this.add.image(400, 300, 'map');
         map.setDisplaySize(800, 600);
 
-        // --- 観光スポットの作成 ---
         this.spotObjects = this.physics.add.staticGroup();
         spots.forEach(spot => {
             const spotObject = this.spotObjects.create(spot.x + spot.width / 2, spot.y + spot.height / 2, null)
@@ -28,45 +24,29 @@ export class GameScene extends Phaser.Scene {
             spotObject.reward = spot.reward;
         });
 
-        // ★★★【変更点】プレイヤーを作成する前に、アニメーションを定義する ★★★
-        // これにより、アニメーションとサイズ変更の処理が衝突するのを防ぎます。
         this.anims.create({
             key: 'stand',
             frames: [ { key: 'player_stand' } ],
-            frameRate: 1
         });
         this.anims.create({
             key: 'walk',
-            // 2枚の画像を交互に表示するアニメーション
-            frames: [
-                { key: 'player_stand' },
-                { key: 'player_walk' }
-            ],
-            frameRate: 4, // 1秒間に4回画像を切り替える
-            repeat: -1    // 無限に繰り返す
+            frames: [ { key: 'player_stand' }, { key: 'player_walk' } ],
+            frameRate: 4,
+            repeat: -1
         });
 
-
-        // --- プレイヤーの作成 ---
-        // 立ち姿の画像('player_stand')でプレイヤーを作成
         this.player = this.physics.add.sprite(400, 300, 'player_stand');
-        this.player.setDisplaySize(96, 96); // サイズを指定
+        this.player.setDisplaySize(96, 96);
         this.player.setCollideWorldBounds(true);
 
-
-        // --- 入力設定 ---
         this.cursors = this.input.keyboard.createCursorKeys();
         this.keys = this.input.keyboard.addKeys('W,A,S,D');
-        this.setupButtonEvents(); // 画面のボタンを有効化
+        this.setupButtonEvents();
 
-        // --- 当たり判定 ---
         this.physics.add.overlap(this.player, this.spotObjects, this.onSpotOverlap, null, this);
-        
-        // --- UIの更新 ---
         this.updateItemBox();
     }
 
-    // (update関数や他の関数に変更はありません)
     update() {
         const speed = 200;
         let velocityX = 0;
@@ -96,6 +76,7 @@ export class GameScene extends Phaser.Scene {
         }
     }
 
+    // (setupButtonEvents 以降の関数は変更ありません)
     setupButtonEvents() {
         const buttonMapping = { 'btn-up': 'up', 'btn-down': 'down', 'btn-left': 'left', 'btn-right': 'right' };
         for (const [buttonId, direction] of Object.entries(buttonMapping)) {

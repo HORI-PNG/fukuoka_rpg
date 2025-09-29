@@ -4,7 +4,7 @@ export const spots = [
     {
         name: '太宰府天満宮',
         x: 350,
-        y: 450,
+        y: 760,
         width: 100,
         height: 100,
         url: 'https://www.dazaifutenmangu.or.jp/',
@@ -21,12 +21,21 @@ export const spots = [
     },
     {
         name: '福岡タワー',
-        x: 200,
-        y: 150,
+        x: 380,
+        y: 340,
         width: 50,
-        height: 50,
+        height: 100,
         url: 'https://www.fukuokatower.co.jp/',
         reward: '明太子'
+    },
+    {
+        name: 'PayPayドーム',
+        x: 770, // 左からの位置
+        y: 370, // 上からの位置
+        width: 100,
+        height: 100,
+        url: 'https://example.com/', // テスト用のURL
+        reward: 'デバッグ成功！'
     },
     {
         name: 'キャナルシティ博多',
@@ -41,6 +50,15 @@ export const spots = [
         name: 'テストエリア',
         x: 10, // 左からの位置
         y: 490, // 上からの位置
+        width: 100,
+        height: 100,
+        url: 'https://example.com/', // テスト用のURL
+        reward: 'デバッグ成功！'
+    },
+    {
+        name: '中州屋台',
+        x: 540, // 左からの位置
+        y: 500, // 上からの位置
         width: 100,
         height: 100,
         url: 'https://example.com/', // テスト用のURL
