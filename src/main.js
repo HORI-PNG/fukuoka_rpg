@@ -9,6 +9,9 @@ const ctx = canvas.getContext('2d');
 let PlayerItems = [];
 let gameState = 'playing'; // ゲームの状態を管理 (playing, dialog)
 let ignoredSpot = null;    // 一時的に無視するスポット
+const JUMP_POWER = 15; // ジャンプの強さ
+const GRAVITY = 0.8;   // 重力
+let redirectUrl = null; // 遷移先のURLを一時的に保存
 
 // --- 画像の読み込み ---
 const mapImage = new Image();
@@ -16,9 +19,9 @@ const playerImage1 = new Image();
 const playerImage2 = new Image();
 
 // 上記で想定したフォルダ構成に合わせてパスを指定しています
-mapImage.src = './assets/fukuoka_map.png';
-playerImage1.src = './assets/player_icon_1.png';
-playerImage2.src = './assets/player_icon_2.png';
+mapImage.src = './assets/fukuoka_map_1.png';
+playerImage1.src = './assets/player_icon_1_shadow.png';
+playerImage2.src = './assets/player_icon_2_shadow.png';
 
 let imagesLoaded = 0;
 const totalImages = 3; // 読み込む画像は3枚
@@ -76,7 +79,7 @@ function draw() {
     ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
 
     spots.forEach(spot => {
-        ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';
+        ctx.fillStyle = 'rgba(91, 135, 176, 0.5)';
         ctx.fillRect(spot.x, spot.y, spot.width, spot.height);
         ctx.fillStyle = 'black';
         ctx.font = '12px sans-serif';
@@ -104,10 +107,13 @@ function draw() {
     ctx.restore(); // 描画状態を元に戻す
 }
 
-// checkSpotCollision 関数をまるごとこれに置き換える
 
+// checkSpotCollision 関数をまるごとこれに置き換える
 function checkSpotCollision() {
-    spots.forEach(spot => {
+    // gameStateが'playing'の時だけあたり判定を行う
+    if (gameState !== 'playing') return;
+
+    for (const spot of spots) {
         if (
             player.x < spot.x + spot.width &&
             player.x + player.width > spot.x &&
@@ -115,26 +121,56 @@ function checkSpotCollision() {
             player.y + player.height > spot.y
         ) {
             if (!sessionStorage.getItem(`visited_${spot.name}`)) {
-                // プレイヤーの動きを止める
-                gameState = 'dialog'; 
+                // gameStateを'jumping'に変更して、プレイヤーの操作を一時的に無効化
+                gameState = 'jumping'; 
                 
-                // 一度訪問したことを記録
+                // ジャンプの初期設定
+                player.isJumping = true;
+                player.initialY = player.y; // ジャンプ開始位置を記録
+                player.jumpVelocity = -JUMP_POWER; // 上向きの初速を与える
+
+                // 訪問記録と遷移先URLの保存
                 sessionStorage.setItem(`visited_${spot.name}`, 'true');
-                
-                // 強制的にURLに移動
-                window.location.href = spot.url;
+                redirectUrl = spot.url; // URLを保存
+
+                // 他のスポットとの重複判定を防ぐためループを抜ける
+                break;
             }
         }
-    });
+    }
 }
 
 // --- ゲームのメインループ ---
 function gameLoop() {
+    // 状態に応じて処理を分岐
     if (gameState === 'playing') {
         updatePlayerPosition(keys, canvas);
+        checkSpotCollision(); 
+    } else if (gameState === 'jumping') {
+        // ジャンプ中の処理
+        player.y += player.jumpVelocity; // 速度に応じてY座標を更新
+        player.jumpVelocity += GRAVITY;  // 重力を速度に加える
+
+        // ジャンプアニメーションの更新
+        player.animTimer++;
+        if (player.animTimer >= player.animSpeed / 2) { // 少し速めにアニメーション
+            player.animTimer = 0;
+            player.animFrame = (player.animFrame + 1) % 2;
+        }
+
+        // 開始位置より下に戻ってきたらジャンプ終了
+        if (player.y > player.initialY) {
+            player.y = player.initialY; // Y座標を元に戻す
+            player.isJumping = false;
+            
+            // 保存しておいたURLに遷移
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            }
+        }
     }
-    draw();
-    checkSpotCollision();
+
+    draw(); // 描画処理は常に実行
     requestAnimationFrame(gameLoop);
 }
 

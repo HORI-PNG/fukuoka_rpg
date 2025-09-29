@@ -2,15 +2,19 @@
 export const player = {
     x: 400,
     y: 300,
-    width: 32,
-    height: 32,
+    width: 120,
+    height: 120,
     speed: 3,
     direction: 'right', // 初期方向
     isMoving: false, // 移動中かどうか
     animFrame: 0, // アニメーションフレーム
     animTimer: 0, // アニメーションタイマー
-    animSpeed: 20 // アニメーション速度
+    animSpeed: 20, // アニメーション速度
+    isJumping: false, // ジャンプ中かどうかのフラグ
+    jumpVelocity: 0,  // ジャンプの速度
+    initialY: 0       // ジャンプ開始前のY座標
 };
+
 // プレイヤーの位置を更新する関数
 // どのキーが押されているか(keys)と、canvasの情報を引数で受け取る
 export function updatePlayerPosition(keys, canvas) {

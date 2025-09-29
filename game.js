@@ -115,7 +115,7 @@ function draw() {
     ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
 
     spots.forEach(spot => {
-        ctx.fillStyle = 'rgba(255, 255, 0, 0.5)'; // スポットの色を半透明の黄色に
+        ctx.fillStyle = 'rgba(159, 221, 232, 0.5)'; // スポットの色を半透明の黄色に
         ctx.fillRect(spot.x, spot.y, spot.width, spot.height);
         ctx.fillStyle = 'black';
         ctx.font = '12px sans-serif';
@@ -157,7 +157,6 @@ window.addEventListener('load', () => {
     checkForReward();
 });
 
-// ★修正点3: 画像読み込みの信頼性を向上させる
 const mapImage = new Image();
 const playerImage = new Image();
 
