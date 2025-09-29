@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ふくおか探訪ゲーム</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
 </head>
 <body>
     <h1>ふくおか探訪ゲーム</h1>
@@ -17,16 +16,14 @@
             <button id="start-button">ゲームを開始する</button>
         </div>
     </div>
-
+    
     <div id="game-info">
         <p>プレイヤー: <span id="current-player"></span></p>
         <p>スコア: <span id="current-score">0</span></p>
         <a href="ranking.html">ランキングを見る</a>
     </div>
 
-    <div id="game-container" style="display: none;">
-        <canvas id="game-canvas" width="800" height="600"></canvas>
-    </div>
+    <div id="game-container" style="display: none;"></div>
 
     <div id="item-box">
         <h2>手に入れた特産品</h2>
@@ -35,16 +32,6 @@
 
     <audio id="bgm" src="./assets/bgm.mp3" loop></audio>
 
-    <script type="module" src="src/main.js"></script>
-
-    <div id="controls">
-        <button id="btn-up">▲</button>
-        <div class="middle-row">
-            <button id="btn-left">◀</button>
-            <button id="btn-right">▶</button>
-        </div>
-        <button id="btn-down">▼</button>
-    </div>
     <div id="controls">
         <button id="btn-up">▲</button>
         <div class="middle-row">
@@ -57,6 +44,9 @@
     <div id="reset-container">
         <button id="reset-button">💣</button>
     </div>
-</body>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <script type="module" src="game.js"></script>
+
 </body>
 </html>
