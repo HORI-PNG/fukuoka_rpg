@@ -1,5 +1,5 @@
-import { GameScene } from './src/scenes/GameScene.js';
-import { QuizScene } from './src/scenes/QuizScene.js';
+import { GameScene } from './scenes/GameScene.js';
+import { QuizScene } from './scenes/QuizScene.js';
 
 // Phaserゲームの設定
 const config = {
@@ -14,22 +14,19 @@ const config = {
     scene: [ GameScene, QuizScene ]
 };
 
-// --- ゲームの自動起動 ---
-// ▼▼▼ スタートボタンの処理を削除し、直接ゲームを起動するように変更 ▼▼▼
-const game = new Phaser.Game(config);
+// --- UI と BGM の制御 ---
+const startButton = document.getElementById('start-button');
+startButton.addEventListener('click', () => {
+    document.getElementById('start-screen').style.display = 'none';
+    const game = new Phaser.Game(config); // ゲームを起動
+    
+    const bgm = document.getElementById('bgm');
+    if (bgm) {
+        bgm.play().catch(e => console.error("BGMの再生に失敗:", e));
+    }
+});
 
-// BGMを再生
-const bgm = document.getElementById('bgm');
-if (bgm) {
-    // ブラウザの仕様により、ユーザーが一度画面をクリックするまで音声が再生されない場合があります
-    document.body.addEventListener('click', () => {
-        if(bgm.paused) {
-            bgm.play().catch(e => console.error("BGMの再生に失敗:", e));
-        }
-    }, { once: true });
-}
-
-// リセットボタンの処理 (変更なし)
+// リセットボタンの処理
 const resetButton = document.getElementById('reset-button');
 if (resetButton) {
     resetButton.addEventListener('click', () => {
@@ -40,7 +37,7 @@ if (resetButton) {
     });
 }
 
-// アイテムボックスの表示切り替え (Eキー) (変更なし)
+// アイテムボックスの表示切り替え (Eキー)
 document.addEventListener('keydown', (e) => {
     if (e.key.toLowerCase() === 'e') {
         const itemBox = document.getElementById('item-box');
