@@ -208,4 +208,16 @@ function init() {
             }
         }
     });
+    const resetButton = document.getElementById('reset-button');
+    if (resetButton) {
+        resetButton.addEventListener('click', () => {
+            // 確認ダイアログを表示
+            if (confirm('訪問履歴をリセットして、もう一度スポットを訪れられるようにしますか？')) {
+                // セッションストレージ（訪問履歴）をすべて消去
+                sessionStorage.clear();
+                // ページをリロードしてゲームを最初から開始
+                window.location.reload();
+            }
+        });
+    }
 }

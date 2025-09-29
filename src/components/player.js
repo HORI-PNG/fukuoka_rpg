@@ -2,14 +2,14 @@
 export const player = {
     x: 400,
     y: 300,
-    width: 120,
-    height: 120,
+    width: 80,
+    height: 80,
     speed: 3,
     direction: 'right', // 初期方向
     isMoving: false, // 移動中かどうか
     animFrame: 0, // アニメーションフレーム
     animTimer: 0, // アニメーションタイマー
-    animSpeed: 20, // アニメーション速度
+    animSpeed: 50, // アニメーション速度
     isJumping: false, // ジャンプ中かどうかのフラグ
     jumpVelocity: 0,  // ジャンプの速度
     initialY: 0       // ジャンプ開始前のY座標

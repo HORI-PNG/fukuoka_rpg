@@ -36,6 +36,15 @@ export const spots = [
         height: 50,
         url: 'https://canalcity.co.jp/',
         reward: 'もつ鍋'
+    },
+    {
+        name: 'テストエリア',
+        x: 10, // 左からの位置
+        y: 490, // 上からの位置
+        width: 100,
+        height: 100,
+        url: 'https://example.com/', // テスト用のURL
+        reward: 'デバッグ成功！'
     }
     
 ];
