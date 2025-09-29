@@ -19,7 +19,6 @@ const playerImage1 = new Image();
 const playerImage2 = new Image();
 const playerImageJump = new Image(); // ジャンプ用の画像変数を追加
 
-// 上記で想定したフォルダ構成に合わせてパスを指定しています
 mapImage.src = './assets/fukuoka_map_1.png';
 playerImage1.src = './assets/player_icon_1_shadow.png';
 playerImage2.src = './assets/player_icon_2_shadow.png';
@@ -30,7 +29,7 @@ const totalImages = 4; // 読み込む画像は4枚
 function onImageLoad() {
     imagesLoaded++;
     if (imagesLoaded === totalImages) {
-        init(); // 
+        init();
     }
 }
 mapImage.onload = onImageLoad;
@@ -72,8 +71,34 @@ function checkForReward() {
     const reward = urlParams.get('reward');
     if (reward) {
         addItem(reward);
+        // URLからパラメータを消去してリロード時に再度アイテムが追加されるのを防ぐ
         window.history.replaceState({}, document.title, window.location.pathname);
     }
+}
+
+// --- スコア管理用の関数 ---
+/**
+ * 全プレイヤーのスコアデータを取得する
+ * @returns {Object} プレイヤー名をキー、スコアを値とするオブジェクト
+ */
+function getScores() {
+    const scores = localStorage.getItem('gameScores');
+    return scores ? JSON.parse(scores) : {};
+}
+
+/**
+ * スコアを保存する
+ * @param {string} playerName - スコアを保存するプレイヤー名
+ * @param {number} points - 加算するポイント
+ */
+function saveScore(playerName, points) {
+    const scores = getScores();
+    if (scores[playerName]) {
+        scores[playerName] += points;
+    } else {
+        scores[playerName] = points;
+    }
+    localStorage.setItem('gameScores', JSON.stringify(scores));
 }
 
 // --- ゲームロジック関連の関数 ---
@@ -90,33 +115,25 @@ function draw() {
     });
 
     let currentImage;
-    // 状態に応じて表示する画像を切り替え
     if (player.isJumping) {
-        // ジャンプ中はジャンプ専用画像
         currentImage = playerImageJump;
     } else if (player.isMoving) {
-        // 移動中はアニメーション
         currentImage = player.animFrame === 0 ? playerImage1 : playerImage2;
     } else {
-        // 停止中は立ち絵
         currentImage = playerImage1;
     }
 
-    ctx.save(); 
+    ctx.save();
     if (player.direction === 'left') {
-        ctx.scale(-1, 1); 
+        ctx.scale(-1, 1);
         ctx.drawImage(currentImage, -player.x - player.width, player.y, player.width, player.height);
     } else {
         ctx.drawImage(currentImage, player.x, player.y, player.width, player.height);
     }
-    ctx.restore(); 
+    ctx.restore();
 }
 
-
-// checkSpotCollision 関数をまるごとこれに置き換える
-// checkSpotCollision 関数をまるごとこれに置き換える
 function checkSpotCollision() {
-    // gameStateが'playing'の時だけあたり判定を行う
     if (gameState !== 'playing') return;
 
     for (const spot of spots) {
@@ -126,21 +143,13 @@ function checkSpotCollision() {
             player.y < spot.y + spot.height &&
             player.y + player.height > spot.y
         ) {
-            // ↓↓↓ 正しいテンプレートリテラルに修正 ↓↓↓
             if (!sessionStorage.getItem(`visited_${spot.name}`)) {
-                // gameStateを'jumping'に変更して、プレイヤーの操作を一時的に無効化
-                gameState = 'jumping'; 
-                
-                // ジャンプの初期設定
+                gameState = 'jumping';
                 player.isJumping = true;
-                player.initialY = player.y; // ジャンプ開始位置を記録
-                player.jumpVelocity = -JUMP_POWER; // 上向きの初速を与える
-
-                // 訪問記録と遷移先URLの保存
+                player.initialY = player.y;
+                player.jumpVelocity = -JUMP_POWER;
                 sessionStorage.setItem(`visited_${spot.name}`, 'true');
-                redirectUrl = spot.url; // URLを保存
-
-                // 他のスポットとの重複判定を防ぐためループを抜ける
+                redirectUrl = spot.url;
                 break;
             }
         }
@@ -151,17 +160,15 @@ function checkSpotCollision() {
 function gameLoop() {
     if (gameState === 'playing') {
         updatePlayerPosition(keys, canvas);
-        checkSpotCollision(); 
+        checkSpotCollision();
     } else if (gameState === 'jumping') {
         player.y += player.jumpVelocity;
         player.jumpVelocity += GRAVITY;
 
-        // ジャンプ中はアニメーションフレームの更新をしない
-
         if (player.y > player.initialY) {
             player.y = player.initialY;
             player.isJumping = false;
-            
+
             if (redirectUrl) {
                 window.location.href = redirectUrl;
             }
@@ -173,31 +180,56 @@ function gameLoop() {
 }
 
 // --- 初期化処理 ---
+// --- 初期化処理 ---
 function init() {
+    // キーボードやボタン操作の受付を開始する
     initializeInput();
+    // 保存されているアイテムを読み込んで表示する
     loadItems();
+    // クイズ正解後の報酬をURLから受け取る
     checkForReward();
 
-    // BGMとスタート画面の処理を追加
+    // HTMLからスタート画面やボタンなどの要素を取得
     const startScreen = document.getElementById('start-screen');
     const startButton = document.getElementById('start-button');
     const gameContainer = document.getElementById('game-container');
     const bgm = document.getElementById('bgm');
 
+    // 「ゲームを開始する」ボタンがクリックされたときの処理
     startButton.addEventListener('click', () => {
-        // スタート画面を非表示にする
+        const playerNameInput = document.getElementById('player-name');
+        const playerName = playerNameInput.value;
+
+        // 名前が入力されていなかったらアラートを出す
+        if (!playerName) {
+            alert('プレイヤー名を入力してください。');
+            return;
+        }
+
+        // 現在操作しているプレイヤーの名前を一時的に保存
+        sessionStorage.setItem('currentPlayer', playerName);
+
+        // スタート画面を消して、ゲーム画面を表示する
         startScreen.style.display = 'none';
-        // ゲームコンテナを表示する
         gameContainer.style.display = 'block';
 
-        // BGMを再生
+        // 画面左上にプレイヤー名と現在のスコアを表示する
+        const gameInfo = document.getElementById('game-info');
+        if (gameInfo) {
+            document.getElementById('current-player').textContent = playerName;
+            const scores = getScores();
+            document.getElementById('current-score').textContent = scores[playerName] || 0;
+            gameInfo.style.display = 'block';
+        }
+
+        // BGMを再生する
         bgm.play();
 
-        // ゲームループを開始
-        gameLoop(); 
+        // ゲームのメインループを開始する
+        gameLoop();
     });
 
-    // Eキーでアイテムボックスの表示/非表示を切り替える
+    // 'e'キーが押されたらアイテムボックスの表示/非表示を切り替える
     document.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 'e') {
             const itemBox = document.getElementById('item-box');
@@ -208,12 +240,14 @@ function init() {
             }
         }
     });
+
+    // リセットボタンが押されたときの処理
     const resetButton = document.getElementById('reset-button');
     if (resetButton) {
         resetButton.addEventListener('click', () => {
             // 確認ダイアログを表示
             if (confirm('訪問履歴をリセットして、もう一度スポットを訪れられるようにしますか？')) {
-                // セッションストレージ（訪問履歴）をすべて消去
+                // 訪問履歴をすべて消去
                 sessionStorage.clear();
                 // ページをリロードしてゲームを最初から開始
                 window.location.reload();

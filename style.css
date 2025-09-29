@@ -125,3 +125,30 @@ h2 {
 #reset-button:active {
     background-color: rgba(255, 105, 180, 1); /* 押したときの色 */
 }
+
+/* スタート画面の入力フォーム */
+#start-box {
+    text-align: center;
+    background-color: white;
+    padding: 40px;
+    border-radius: 15px;
+}
+#player-name {
+    display: block;
+    margin: 20px auto;
+    padding: 10px;
+    width: 80%;
+    font-size: 1.2em;
+}
+
+/* ゲーム中の情報表示 */
+#game-info {
+    display: none; /* 初期状態では非表示 */
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 10px;
+    z-index: 100;
+}
