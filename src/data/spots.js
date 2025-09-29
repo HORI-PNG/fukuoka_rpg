@@ -5,8 +5,8 @@ export const spots = [
         name: '太宰府天満宮',
         x: 350,
         y: 450,
-        width: 50,
-        height: 50,
+        width: 100,
+        height: 100,
         url: 'https://www.dazaifutenmangu.or.jp/',
         reward: '梅ヶ枝餅'
     },
@@ -14,8 +14,8 @@ export const spots = [
         name: '門司港レトロ',
         x: 650,
         y: 100,
-        width: 50,
-        height: 50,
+        width: 100,
+        height: 100,
         url: 'https://example.com/mojiko-minigame',
         reward: '焼きカレー'
     },

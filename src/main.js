@@ -114,6 +114,7 @@ function draw() {
 
 
 // checkSpotCollision 関数をまるごとこれに置き換える
+// checkSpotCollision 関数をまるごとこれに置き換える
 function checkSpotCollision() {
     // gameStateが'playing'の時だけあたり判定を行う
     if (gameState !== 'playing') return;
@@ -125,6 +126,7 @@ function checkSpotCollision() {
             player.y < spot.y + spot.height &&
             player.y + player.height > spot.y
         ) {
+            // ↓↓↓ 正しいテンプレートリテラルに修正 ↓↓↓
             if (!sessionStorage.getItem(`visited_${spot.name}`)) {
                 // gameStateを'jumping'に変更して、プレイヤーの操作を一時的に無効化
                 gameState = 'jumping'; 
