@@ -40,7 +40,7 @@ export function updatePlayerPosition(keys, canvas) {
     if (player.isMoving) {
         player.animTimer++;
         if (player.animTimer >= player.animSpeed) {
-            player.aniumTimer = 0;
+            player.animTimer = 0;
             player.animFrame = (player.animFrame + 1) % 2; // フレームを進める
         }
     } else {
