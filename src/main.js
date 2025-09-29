@@ -17,14 +17,16 @@ let redirectUrl = null; // 遷移先のURLを一時的に保存
 const mapImage = new Image();
 const playerImage1 = new Image();
 const playerImage2 = new Image();
+const playerImageJump = new Image(); // ジャンプ用の画像変数を追加
 
 // 上記で想定したフォルダ構成に合わせてパスを指定しています
 mapImage.src = './assets/fukuoka_map_1.png';
 playerImage1.src = './assets/player_icon_1_shadow.png';
 playerImage2.src = './assets/player_icon_2_shadow.png';
+playerImageJump.src = './assets/player_icon_3_shadow.png';
 
 let imagesLoaded = 0;
-const totalImages = 3; // 読み込む画像は3枚
+const totalImages = 4; // 読み込む画像は4枚
 function onImageLoad() {
     imagesLoaded++;
     if (imagesLoaded === totalImages) {
@@ -34,6 +36,7 @@ function onImageLoad() {
 mapImage.onload = onImageLoad;
 playerImage1.onload = onImageLoad;
 playerImage2.onload = onImageLoad;
+playerImageJump.onload = onImageLoad;
 
 // --- UI関連の関数 ---
 function displayItems() {
@@ -87,24 +90,26 @@ function draw() {
     });
 
     let currentImage;
-    // 移動中はアニメーションフレームに応じて画像を切り替え
-    if (player.isMoving) {
+    // 状態に応じて表示する画像を切り替え
+    if (player.isJumping) {
+        // ジャンプ中はジャンプ専用画像
+        currentImage = playerImageJump;
+    } else if (player.isMoving) {
+        // 移動中はアニメーション
         currentImage = player.animFrame === 0 ? playerImage1 : playerImage2;
     } else {
-        // 停止中は1枚目の画像を立ち絵として表示
+        // 停止中は立ち絵
         currentImage = playerImage1;
     }
 
-    ctx.save(); // 現在の描画状態を保存
-    // 左向きの時だけ画像を反転させる
+    ctx.save(); 
     if (player.direction === 'left') {
-        ctx.scale(-1, 1); // 左右反転
-        // 反転させた分、描画位置をずらす
+        ctx.scale(-1, 1); 
         ctx.drawImage(currentImage, -player.x - player.width, player.y, player.width, player.height);
     } else {
         ctx.drawImage(currentImage, player.x, player.y, player.width, player.height);
     }
-    ctx.restore(); // 描画状態を元に戻す
+    ctx.restore(); 
 }
 
 
@@ -142,35 +147,26 @@ function checkSpotCollision() {
 
 // --- ゲームのメインループ ---
 function gameLoop() {
-    // 状態に応じて処理を分岐
     if (gameState === 'playing') {
         updatePlayerPosition(keys, canvas);
         checkSpotCollision(); 
     } else if (gameState === 'jumping') {
-        // ジャンプ中の処理
-        player.y += player.jumpVelocity; // 速度に応じてY座標を更新
-        player.jumpVelocity += GRAVITY;  // 重力を速度に加える
+        player.y += player.jumpVelocity;
+        player.jumpVelocity += GRAVITY;
 
-        // ジャンプアニメーションの更新
-        player.animTimer++;
-        if (player.animTimer >= player.animSpeed / 2) { // 少し速めにアニメーション
-            player.animTimer = 0;
-            player.animFrame = (player.animFrame + 1) % 2;
-        }
+        // ジャンプ中はアニメーションフレームの更新をしない
 
-        // 開始位置より下に戻ってきたらジャンプ終了
         if (player.y > player.initialY) {
-            player.y = player.initialY; // Y座標を元に戻す
+            player.y = player.initialY;
             player.isJumping = false;
             
-            // 保存しておいたURLに遷移
             if (redirectUrl) {
                 window.location.href = redirectUrl;
             }
         }
     }
 
-    draw(); // 描画処理は常に実行
+    draw();
     requestAnimationFrame(gameLoop);
 }
 
