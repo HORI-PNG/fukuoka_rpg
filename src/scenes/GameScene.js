@@ -16,12 +16,20 @@ export class GameScene extends Phaser.Scene {
         const map = this.add.image(400, 300, 'map');
         map.setDisplaySize(800, 600);
 
+        // デバッグ用のグラフィックオブジェクトを作成
+        const debugGraphics = this.add.graphics({ fillStyle: { color: 0x0000ff, alpha: 0.3 } }); // 青色で透明度30%
+
         this.spotObjects = this.physics.add.staticGroup();
         spots.forEach(spot => {
-            const spotObject = this.spotObjects.create(spot.x + spot.width / 2, spot.y + spot.height / 2, null)
-                .setSize(spot.width, spot.height).setVisible(false);
+            const spotObject = this.spotObjects.create(spot.x, spot.y, null)
+                .setSize(spot.width, spot.height)
+                .setVisible(false);
             spotObject.name = spot.name;
             spotObject.reward = spot.reward;
+
+            const drawX = spot.x - spot.width / 2;
+            const drawY = spot.y - spot.height / 2;
+            debugGraphics.fillRect(spot.x, spot.y, spot.width, spot.height);
         });
 
         this.anims.create({
@@ -93,7 +101,11 @@ export class GameScene extends Phaser.Scene {
         if (!sessionStorage.getItem(`visited_${spot.name}`)) {
             sessionStorage.setItem(`visited_${spot.name}`, 'true');
             this.scene.pause();
-            this.scene.launch('QuizScene', { spotName: spot.name, reward: spot.reward });
+            if (spot.type === 'memory') {
+                this.scene.launch('MemoryScene', { spotName: spot.name, reward: spot.reward });
+            } else {
+                this.scene.launch('QuizScene', { spotName: spot.name, reward: spot.reward });
+            }
         }
     }
     addItem(itemName) {

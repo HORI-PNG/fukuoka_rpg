@@ -3,6 +3,7 @@
 export const spots = [
     {
         name: '太宰府天満宮',
+        type: 'quiz',
         x: 350,
         y: 760,
         width: 100,
@@ -12,6 +13,7 @@ export const spots = [
     },
     {
         name: '門司港レトロ',
+        type: 'quiz',
         x: 650,
         y: 100,
         width: 100,
@@ -21,6 +23,7 @@ export const spots = [
     },
     {
         name: '福岡タワー',
+        type: 'quiz',
         x: 380,
         y: 340,
         width: 50,
@@ -30,8 +33,9 @@ export const spots = [
     },
     {
         name: 'PayPayドーム',
-        x: 770, // 左からの位置
-        y: 370, // 上からの位置
+        type: 'quiz',
+        x: 720, // 左からの位置
+        y: 400, // 上からの位置
         width: 100,
         height: 100,
         url: 'https://example.com/', // テスト用のURL
@@ -39,6 +43,7 @@ export const spots = [
     },
     {
         name: 'キャナルシティ博多',
+        type: 'quiz',
         x: 500,
         y: 300,
         width: 50,
@@ -48,6 +53,7 @@ export const spots = [
     },
     {
         name: 'テストエリア',
+        type: 'quiz',
         x: 10, // 左からの位置
         y: 490, // 上からの位置
         width: 100,
@@ -57,6 +63,7 @@ export const spots = [
     },
     {
         name: '中州屋台',
+        type: 'quiz',
         x: 540, // 左からの位置
         y: 500, // 上からの位置
         width: 100,

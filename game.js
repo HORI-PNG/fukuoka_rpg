@@ -51,6 +51,30 @@ window.addEventListener('load', () => {
         startScreen.style.display = 'none';
         gameContainer.style.display = 'block';
         document.getElementById('game-info').style.display = 'block';
+        const resetButton = document.getElementById('reset-button');
+        if (resetButton) {
+            resetButton.addEventListener('click', () => {
+                // 1. パスワードの入力を求める
+                const password = prompt('データを初期化します。パスワードを入力してください:');
+
+                // 2. パスワードが正しいかチェック (パスワードは 'admin' に設定)
+                if (password === 'admin') {
+                    if (confirm('本当によろしいですか？全てのスコアとアイテムが削除されます。')) {
+                        // 3. 正しい場合、全てのデータを削除
+                        sessionStorage.clear(); // 訪問履歴をリセット
+                        localStorage.removeItem('gameScores'); // 全プレイヤーのスコアを削除
+                        localStorage.removeItem('playerItems'); // 全プレイヤーのアイテムを削除
+
+                        // 4. ページをリロードしてゲームを最初から開始
+                        alert('データを初期化しました。');
+                        window.location.reload();
+                    }
+                } else if (password !== null) {
+                    // パスワードが間違っている場合 (nullはキャンセルボタン)
+                    alert('パスワードが違います。');
+                }
+            });
+        }
         
         // BGM再生（うるさいのでコメントアウト）
         // if (bgm) bgm.play();
