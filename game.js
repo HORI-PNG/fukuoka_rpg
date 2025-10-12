@@ -1,179 +1,90 @@
-const canvas = document.getElementById('game-canvas');
-const ctx = canvas.getContext('2d');
+import { GameScene } from './src/scenes/GameScene.js'; // `GameScrene.js` は後で `GameScene.js` に名前変更します
+import { QuizScene } from './src/scenes/QuizScene.js';
 
-// プレイヤーが所持しているアイテム
-let PlayerItems = [];
-
-// アイテムを画面に表示する関数
-function displayItems() {
-    const itemsDiv = document.getElementById('items');
-    itemsDiv.innerHTML = ''; // 既存のアイテムをクリア
-    PlayerItems.forEach(item => {
-        const itemElement = document.createElement('div');
-        // ★修正点1: 変数名を itemElement に修正
-        itemElement.className = 'item';
-        itemElement.textContent = item;
-        itemsDiv.appendChild(itemElement);
-    });
+// --- スコア管理 ---
+function getScores() {
+    const scores = localStorage.getItem('gameScores');
+    return scores ? JSON.parse(scores) : {};
 }
 
-// ページ読み込み時にローカルストレージからアイテムを読み込む
-function loadItems() {
-    const savedItems = localStorage.getItem('playerItems');
-    if (savedItems) {
-        PlayerItems = JSON.parse(savedItems);
-    }
-    displayItems();
-}
-
-// 新しいアイテムを追加し、保存する関数を正しく定義
-function addItem(itemName) {
-    if (!PlayerItems.includes(itemName)) {
-        PlayerItems.push(itemName);
-        localStorage.setItem('playerItems', JSON.stringify(PlayerItems));
-        displayItems();
-        alert(`「${itemName}」を手に入れた！`);
-    }
-}
-
-// URLパラメータをチェックして報酬を受け取る関数
-function checkForReward() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const reward = urlParams.get('reward');
-    if (reward) {
-        // ★修正点2: 正しいaddItem関数を呼び出す
-        addItem(reward);
-        // URLからクエリパラメータを削除
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-}
-
-// プレイヤーの情報
-const player = {
-    x: 400,
-    y: 300,
-    width: 32,
-    height: 32,
-    speed: 5
-};
-
-// 観光スポットの情報
-const spots = [
-    {
-        name: '太宰府天満宮',
-        x: 350,
-        y: 450,
-        width: 50,
-        height: 50,
-        url: 'https://www.dazaifutenmangu.or.jp/',
-        reward: '梅ヶ枝餅'
+// --- Phaser ゲーム設定 ---
+const config = {
+    type: Phaser.AUTO,
+    parent: 'game-container', // このIDを持つdivの中にゲーム画面が作られる
+    width: 800,
+    height: 600,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false 
+        }
     },
-    {
-        name: '門司港レトロ',
-        x: 650,
-        y: 100,
-        width: 50,
-        height: 50,
-        url: 'https://example.com/mojiko-minigame',
-        reward: '焼きカレー'
-    }
-];
-
-// キー入力の状態を管理するオブジェクト
-const keys = {
-    ArrowUp: false,
-    ArrowDown: false,
-    ArrowLeft: false,
-    ArrowRight: false
+    scene: [GameScene, QuizScene] // 使用するシーンを登録
 };
 
-// キーが押された時の処理
-document.addEventListener('keydown', (e) => {
-    if (e.key in keys) {
-        keys[e.key] = true;
-    }
-});
+// --- ゲーム起動処理 ---
+const game = new Phaser.Game(config);
 
-// キーが離された時の処理
-document.addEventListener('keyup', (e) => {
-    if (e.key in keys) {
-        keys[e.key] = false;
-    }
-});
+// --- UI操作 ---
+window.addEventListener('load', () => {
+    const startScreen = document.getElementById('start-screen');
+    const startButton = document.getElementById('start-button');
+    const gameContainer = document.getElementById('game-container');
+    const playerNameInput = document.getElementById('player-name');
+    const bgm = document.getElementById('bgm');
 
-// プレイヤーの位置を更新する関数
-function updatePlayerPosition() {
-    if (keys.ArrowUp && player.y > 0) player.y -= player.speed;
-    if (keys.ArrowDown && player.y < canvas.height - player.height) player.y += player.speed;
-    if (keys.ArrowLeft && player.x > 0) player.x -= player.speed;
-    if (keys.ArrowRight && player.x < canvas.width - player.width) player.x += player.speed;
-}
+    startButton.addEventListener('click', () => {
+        const playerName = playerNameInput.value;
+        if (!playerName) {
+            alert('プレイヤー名を入力してください。');
+            return;
+        }
 
-// 画面を描画する関数
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
+        // プレイヤー情報を保存・表示
+        sessionStorage.setItem('currentPlayer', playerName);
+        document.getElementById('current-player').textContent = playerName;
+        const scores = getScores();
+        document.getElementById('current-score').textContent = scores[playerName] || 0;
+        
+        // UIの表示切り替え
+        startScreen.style.display = 'none';
+        gameContainer.style.display = 'block';
+        document.getElementById('game-info').style.display = 'block';
+        const resetButton = document.getElementById('reset-button');
+        if (resetButton) {
+            resetButton.addEventListener('click', () => {
+                // 1. パスワードの入力を求める
+                const password = prompt('データを初期化します。パスワードを入力してください:');
 
-    spots.forEach(spot => {
-        ctx.fillStyle = 'rgba(255, 255, 0, 0.5)'; // スポットの色を半透明の黄色に
-        ctx.fillRect(spot.x, spot.y, spot.width, spot.height);
-        ctx.fillStyle = 'black';
-        ctx.font = '12px sans-serif';
-        ctx.fillText(spot.name, spot.x, spot.y - 5);
+                // 2. パスワードが正しいかチェック (パスワードは 'admin' に設定)
+                if (password === 'admin') {
+                    if (confirm('本当によろしいですか？全てのスコアとアイテムが削除されます。')) {
+                        // 3. 正しい場合、全てのデータを削除
+                        sessionStorage.clear(); // 訪問履歴をリセット
+                        localStorage.removeItem('gameScores'); // 全プレイヤーのスコアを削除
+                        localStorage.removeItem('playerItems'); // 全プレイヤーのアイテムを削除
+
+                        // 4. ページをリロードしてゲームを最初から開始
+                        alert('データを初期化しました。');
+                        window.location.reload();
+                    }
+                } else if (password !== null) {
+                    // パスワードが間違っている場合 (nullはキャンセルボタン)
+                    alert('パスワードが違います。');
+                }
+            });
+        }
+        
+        // BGM再生（うるさいのでコメントアウト）
+        // if (bgm) bgm.play();
     });
 
-    ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
-}
-
-// スポットとのあたり判定をチェックする関数
-function checkSpotCollision() {
-    spots.forEach(spot => {
-        if (player.x < spot.x + spot.width &&
-            player.x + player.width > spot.x &&
-            player.y < spot.y + spot.height &&
-            player.y + player.height > spot.y
-        ) {
-            if (!sessionStorage.getItem(`visited_${spot.name}`)) {
-                if (confirm(`「${spot.name}」に到着！\nミニゲームに挑戦しますか？`)) {
-                    sessionStorage.setItem(`visited_${spot.name}`, 'true');
-                    window.location.href = spot.url;
-                }
-            }
+    // アイテムボックスの表示切り替え
+    document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'e') {
+            const itemBox = document.getElementById('item-box');
+            itemBox.style.display = itemBox.style.display === 'block' ? 'none' : 'block';
         }
     });
-}
-
-// ゲームのメインループ
-function gameLoop() {
-    updatePlayerPosition();
-    draw();
-    checkSpotCollision();
-    requestAnimationFrame(gameLoop);
-}
-
-// ページの読み込みが完了したときにアイテム関連の処理を実行
-window.addEventListener('load', () => {
-    loadItems();
-    checkForReward();
 });
-
-// ★修正点3: 画像読み込みの信頼性を向上させる
-const mapImage = new Image();
-const playerImage = new Image();
-
-let imagesLoaded = 0;
-const totalImages = 2;
-
-function onImageLoad() {
-    imagesLoaded++;
-    if (imagesLoaded === totalImages) {
-        // 全ての画像が読み込まれたらゲームを開始
-        gameLoop();
-    }
-}
-
-mapImage.onload = onImageLoad;
-playerImage.onload = onImageLoad;
-
-mapImage.src = 'fukuoka_map.png';
-playerImage.src = 'player_icon.png';
