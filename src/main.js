@@ -123,6 +123,7 @@ function checkSpecialStageCondition() {
     }
 }
 
+<<<<<<< HEAD
 // === 描画処理 ===
 function draw() {
     let cameraX = canvas.width / 2 - player.x * TILE_SIZE;
@@ -145,6 +146,23 @@ function draw() {
             ctx.drawImage(
                 tilesetImage, sourceX, sourceY, 256, 256, col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
+=======
+// ★追加：特殊ステージの条件をチェックする新しい関数
+function checkSpecialStageCondition() {
+    const requiredItems = 3; // ボタン表示に必要なアイテム数
+    const specialStageArea = document.getElementById('special-stage-area');
+
+    // プレイヤーの所持アイテム数が条件を満たしたらボタンを表示
+    if (PlayerItems.length >= requiredItems) {
+        specialStageArea.style.display = 'block';
+    }
+}
+
+// --- ゲームのメインループ ---
+function gameLoop() {
+    if (gameState === 'playing') {
+        updatePlayerPosition(keys, canvas);
+>>>>>>> 0fcdcbeb0b374e067ea332318373cb4f7e3f4880
     }
     
     // 2. 物体レイヤーを描画
@@ -181,12 +199,17 @@ function gameLoop() {
     updatePlayerPosition(keys, baseMapData);
     draw();
     checkSpotCollision();
+<<<<<<< HEAD
     checkSpecialStageCondition();
+=======
+    checkSpecialStageCondition(); // 特殊ステージの条件をチェック
+>>>>>>> 0fcdcbeb0b374e067ea332318373cb4f7e3f4880
     requestAnimationFrame(gameLoop);
 }
 
 // === 初期化処理 ===
 function init() {
+<<<<<<< HEAD
     initializeInput(); loadItems(); checkForReward();
     // イベントリスナー
     document.getElementById('special-stage-button')?.addEventListener('click', () => { window.location.href = './games/special_stage/index.html'; });
@@ -195,6 +218,16 @@ function init() {
     document.addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'e') toggleItemBox(); });
     
     const bgmToggleButton = document.getElementById('bgm-toggle-button');
+=======
+    // 最初に共通の処理を実行
+    initializeInput();
+    loadItems();
+    checkForReward();
+
+    // HTML要素を取得
+    const startScreen = document.getElementById('start-screen');
+    const gameContainer = document.getElementById('game-container');
+>>>>>>> 0fcdcbeb0b374e067ea332318373cb4f7e3f4880
     const bgm = document.getElementById('bgm');
     if (bgm) bgm.volume = 0.2;
     if (bgmToggleButton && bgm) {
@@ -205,6 +238,7 @@ function init() {
         });
     }
 
+<<<<<<< HEAD
     // 画面表示の分岐
     const startScreen = document.getElementById('start-screen');
     const gameContainer = document.getElementById('game-container');
@@ -223,4 +257,70 @@ function init() {
             gameLoop();
         }, { once: true });
     }
+=======
+    // localStorageに'hasPlayedBefore'という記録があるかチェック
+    if (localStorage.getItem('hasPlayedBefore') === 'true') {
+        // 【2回目以降のアクセスの場合】
+        // スタート画面を隠し、ゲーム画面を直接表示
+        startScreen.style.display = 'none';
+        gameContainer.style.display = 'block';
+
+        // BGMは自動再生されない可能性があります
+        // 多くのブラウザでは、ユーザーが最初にクリックしないと音声を再生できません。
+        // そのため、2回目以降はBGMなしで静かにゲームが始まります。
+
+        // ゲームループを即座に開始
+        gameLoop();
+
+    } else {
+        // 【初回アクセスの場合】
+        // スタートボタンのクリックを待つ
+        const startButton = document.getElementById('start-button');
+        startButton.addEventListener('click', () => {
+            // クリックされたら、「プレイ済み」の記録をlocalStorageに保存
+            localStorage.setItem('hasPlayedBefore', 'true');
+
+            // スタート画面を隠し、ゲーム画面を表示
+            startScreen.style.display = 'none';
+            gameContainer.style.display = 'block';
+
+            // BGMを再生
+            bgm.play();
+
+            // ゲームループを開始
+            gameLoop();
+        });
+    }
+
+    // ★追加：特殊ステージボタンのクリックイベント
+    const specialStageButton = document.getElementById('special-stage-button');
+    specialStageButton.addEventListener('click', () => {
+        window.location.href = './games/special_stage/index.html';
+    });
+
+    const resetButton = document.getElementById('reset-button');
+    resetButton.addEventListener('click', () => {
+        // 確認ダイアログを表示
+        if (confirm('本当にすべてのデータをリセットして、はじめからやり直しますか？')) {
+            // 保存されているデータを削除
+            localStorage.removeItem('playerItems');
+            localStorage.removeItem('hasPlayedBefore');
+            
+            // ページを再読み込みしてゲームをリスタート
+            window.location.reload();
+        }
+    });
+
+    // Eキーのイベントリスナー
+    document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'e') {
+            const itemBox = document.getElementById('item-box');
+            if (itemBox.style.display === 'block') {
+                itemBox.style.display = 'none';
+            } else {
+                itemBox.style.display = 'block';
+            }
+        }
+    });
+>>>>>>> 0fcdcbeb0b374e067ea332318373cb4f7e3f4880
 }
