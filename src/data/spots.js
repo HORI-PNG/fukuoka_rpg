@@ -11,12 +11,12 @@ export const spots = [
     },
     {
         name: '門司港レトロ',
-        type: 'quiz',
+        type: 'minigame', // typeを'minigame'に変更
         x: 650,
         y: 100,
         width: 100,
         height: 100,
-        url: 'https://example.com/mojiko-minigame',
+        url: './games/mojiko/index.html', // 門司港のゲームURLを追加
         reward: '焼きカレー'
     },
     {

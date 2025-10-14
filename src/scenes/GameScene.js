@@ -17,19 +17,26 @@ export class GameScene extends Phaser.Scene {
         map.setDisplaySize(800, 600);
 
         // デバッグ用のグラフィックオブジェクトを作成
-        const debugGraphics = this.add.graphics({ fillStyle: { color: 0x0000ff, alpha: 0.3 } }); // 青色で透明度30%
+        const debugGraphics = this.add.graphics({ fillStyle: { color: 0x0000ff, alpha: 0.2 } }); // 透明度を0.2に変更
 
         this.spotObjects = this.physics.add.staticGroup();
         spots.forEach(spot => {
+            // 当たり判定のサイズを少し小さく調整
+            const hitBoxWidth = spot.width * 0.8;
+            const hitBoxHeight = spot.height * 0.8;
+
             const spotObject = this.spotObjects.create(spot.x, spot.y, null)
-                .setSize(spot.width, spot.height)
+                .setSize(hitBoxWidth, hitBoxHeight) // サイズを調整
                 .setVisible(false);
             spotObject.name = spot.name;
             spotObject.reward = spot.reward;
+            spotObject.url = spot.url; // URLプロパティを追加
+            spotObject.type = spot.type; // typeプロパティを追加
 
-            const drawX = spot.x - spot.width / 2;
-            const drawY = spot.y - spot.height / 2;
-            debugGraphics.fillRect(spot.x, spot.y, spot.width, spot.height);
+
+            const drawX = spot.x - hitBoxWidth / 2;
+            const drawY = spot.y - hitBoxHeight / 2;
+            debugGraphics.fillRect(drawX, drawY, hitBoxWidth, hitBoxHeight); // 描画位置とサイズを調整
         });
 
         this.anims.create({
@@ -101,9 +108,9 @@ export class GameScene extends Phaser.Scene {
         if (!sessionStorage.getItem(`visited_${spot.name}`)) {
             sessionStorage.setItem(`visited_${spot.name}`, 'true');
 
-            // ▼▼▼ ここから修正 ▼▼▼
-            if (spot.url && (spot.type === 'minigame' || spot.type === 'quiz')) {
-                // spotにURLがあれば、そのページに移動する
+            // spotにURLがあり、それが 'http' で始まらない（ローカルファイルである）場合
+            if (spot.url && !spot.url.startsWith('http')) {
+                // そのページに移動する
                 window.location.href = spot.url;
             } else {
                 // URLがないクイズなどの場合（従来の処理）
@@ -116,6 +123,7 @@ export class GameScene extends Phaser.Scene {
             }
         }
     }
+    
     addItem(itemName) {
         if (!window.PlayerItems) { window.PlayerItems = JSON.parse(localStorage.getItem('playerItems')) || []; }
         if (!window.PlayerItems.includes(itemName)) {
