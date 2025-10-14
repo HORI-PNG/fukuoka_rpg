@@ -100,11 +100,19 @@ export class GameScene extends Phaser.Scene {
     onSpotOverlap(player, spot) {
         if (!sessionStorage.getItem(`visited_${spot.name}`)) {
             sessionStorage.setItem(`visited_${spot.name}`, 'true');
-            this.scene.pause();
-            if (spot.type === 'memory') {
-                this.scene.launch('MemoryScene', { spotName: spot.name, reward: spot.reward });
+
+            // ▼▼▼ ここから修正 ▼▼▼
+            if (spot.url && (spot.type === 'minigame' || spot.type === 'quiz')) {
+                // spotにURLがあれば、そのページに移動する
+                window.location.href = spot.url;
             } else {
-                this.scene.launch('QuizScene', { spotName: spot.name, reward: spot.reward });
+                // URLがないクイズなどの場合（従来の処理）
+                this.scene.pause();
+                if (spot.type === 'memory') {
+                    this.scene.launch('MemoryScene', { spotName: spot.name, reward: spot.reward });
+                } else {
+                    this.scene.launch('QuizScene', { spotName: spot.name, reward: spot.reward });
+                }
             }
         }
     }

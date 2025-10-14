@@ -69,14 +69,4 @@ export const spots = [
         url: './games/yatai_shooting/index.html', // ★新しいゲームのHTMLへのパスを指定
         reward: 'ラーメン' // ★script.jsで指定したアイテム名と合わせる
     },
-    {
-        name: '新しいミニゲームの場所',
-        type: 'minigame', // わかりやすく 'minigame' にする（'quiz' のままでもOK）
-        x: 100, // マップ上のX座標
-        y: 200, // マップ上のY座標
-        width: 100,
-        height: 100,
-        url: './games/new_minigame/index.html', // ミニゲームのHTMLへのパス
-        reward: '新しいアイテム' // ミニゲームクリアで貰えるアイテム
-    }
 ];
