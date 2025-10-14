@@ -1,4 +1,4 @@
-import { GameScene } from './src/scenes/GameScene.js'; // `GameScrene.js` は後で `GameScene.js` に名前変更します
+import { GameScene } from './src/scenes/GameScene.js';
 import { QuizScene } from './src/scenes/QuizScene.js';
 
 // --- スコア管理 ---
@@ -10,7 +10,7 @@ function getScores() {
 // --- Phaser ゲーム設定 ---
 const config = {
     type: Phaser.AUTO,
-    parent: 'game-container', // このIDを持つdivの中にゲーム画面が作られる
+    parent: 'game-container',
     width: 800,
     height: 600,
     physics: {
@@ -20,67 +20,93 @@ const config = {
             debug: false 
         }
     },
-    scene: [GameScene, QuizScene] // 使用するシーンを登録
+    scene: [GameScene, QuizScene]
 };
 
 // --- ゲーム起動処理 ---
 const game = new Phaser.Game(config);
 
+/**
+ * ゲームを開始し、UIをセットアップする関数
+ * @param {string} playerName - ゲームを開始するプレイヤー名
+ */
+function setupGame(playerName) {
+    const scores = getScores();
+    sessionStorage.setItem('currentPlayer', playerName);
+
+    // UIの表示を更新
+    document.getElementById('current-player').textContent = playerName;
+    document.getElementById('current-score').textContent = scores[playerName] || 0;
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('game-container').style.display = 'block';
+    document.getElementById('game-info').style.display = 'block';
+
+    // リセットボタンのイベントリスナーを設定
+    const resetButton = document.getElementById('reset-button');
+    if (resetButton && !resetButton.dataset.listenerAttached) {
+        resetButton.dataset.listenerAttached = 'true'; // 多重登録を防止
+        resetButton.addEventListener('click', () => {
+            const password = prompt('データを初期化します。パスワードを入力してください:');
+            if (password === 'admin') {
+                if (confirm('本当によろしいですか？全てのスコアとアイテムが削除されます。')) {
+                    sessionStorage.clear();
+                    localStorage.removeItem('gameScores');
+                    localStorage.removeItem('playerItems');
+                    alert('データを初期化しました。');
+                    window.location.reload();
+                }
+            } else if (password !== null) {
+                alert('パスワードが違います。');
+            }
+        });
+    }
+}
+
 // --- UI操作 ---
 window.addEventListener('load', () => {
-    const startScreen = document.getElementById('start-screen');
+    const currentPlayer = sessionStorage.getItem('currentPlayer');
     const startButton = document.getElementById('start-button');
-    const gameContainer = document.getElementById('game-container');
     const playerNameInput = document.getElementById('player-name');
-    const bgm = document.getElementById('bgm');
 
+    // すでにプレイヤー名が保存されていれば、すぐにゲームを開始
+    if (currentPlayer) {
+        setupGame(currentPlayer);
+    }
+
+    // スタートボタンがクリックされたときの処理
     startButton.addEventListener('click', () => {
         const playerName = playerNameInput.value;
         if (!playerName) {
             alert('プレイヤー名を入力してください。');
             return;
         }
-
-        // プレイヤー情報を保存・表示
-        sessionStorage.setItem('currentPlayer', playerName);
-        document.getElementById('current-player').textContent = playerName;
-        const scores = getScores();
-        document.getElementById('current-score').textContent = scores[playerName] || 0;
-        
-        // UIの表示切り替え
-        startScreen.style.display = 'none';
-        gameContainer.style.display = 'block';
-        document.getElementById('game-info').style.display = 'block';
-        const resetButton = document.getElementById('reset-button');
-        if (resetButton) {
-            resetButton.addEventListener('click', () => {
-                // 1. パスワードの入力を求める
-                const password = prompt('データを初期化します。パスワードを入力してください:');
-
-                // 2. パスワードが正しいかチェック (パスワードは 'admin' に設定)
-                if (password === 'admin') {
-                    if (confirm('本当によろしいですか？全てのスコアとアイテムが削除されます。')) {
-                        // 3. 正しい場合、全てのデータを削除
-                        sessionStorage.clear(); // 訪問履歴をリセット
-                        localStorage.removeItem('gameScores'); // 全プレイヤーのスコアを削除
-                        localStorage.removeItem('playerItems'); // 全プレイヤーのアイテムを削除
-
-                        // 4. ページをリロードしてゲームを最初から開始
-                        alert('データを初期化しました。');
-                        window.location.reload();
-                    }
-                } else if (password !== null) {
-                    // パスワードが間違っている場合 (nullはキャンセルボタン)
-                    alert('パスワードが違います。');
-                }
-            });
-        }
-        
-        // BGM再生（うるさいのでコメントアウト）
-        // if (bgm) bgm.play();
+        setupGame(playerName);
     });
 
-    // アイテムボックスの表示切り替え
+    function checkForReward() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const reward = urlParams.get('reward');
+
+        if (reward) {
+            // ローカルストレージから現在のアイテムリストを取得
+            const currentItems = JSON.parse(localStorage.getItem('playerItems')) || [];
+            
+            // アイテムがまだリストになければ追加
+            if (!currentItems.includes(reward)) {
+                currentItems.push(reward);
+                localStorage.setItem('playerItems', JSON.stringify(currentItems));
+                alert(`「${reward}」を手に入れた！`);
+            }
+            
+            // URLからパラメータを削除して、リロード時に再度追加されるのを防ぐ
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+
+    // ページ読み込み時に報酬をチェックする
+    checkForReward();
+
+    // アイテムボックスの表示切り替え (Eキー)
     document.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 'e') {
             const itemBox = document.getElementById('item-box');
