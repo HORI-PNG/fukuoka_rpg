@@ -6,50 +6,6 @@
     <title>ふくおか探訪ゲーム</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
-    <script type="module" src="game.js"></script>
-
-    <script type="module">
-      // Firebase SDKから必要な関数をインポートします
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-      import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-      import { getFirestore, collection, doc, getDoc, setDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-
-      // あなたのFirebaseプロジェクトの設定情報
-      // ★★★★★ ここに、Firebaseコンソールからコピーした自分のfirebaseConfigを貼り付ける ★★★★★
-      const firebaseConfig = {
-        apiKey: "AIzaSyBekQh7_Osc13c4FvCX4Smm70MX7Z_f5ao",
-        authDomain: "fukuoka-rpg.firebaseapp.com",
-        projectId: "fukuoka-rpg",
-        storageBucket: "fukuoka-rpg.firebasestorage.app",
-        messagingSenderId: "104366485937",
-        appId: "1:104366485937:web:3549cccbefe5b4f9cd0d90",
-        measurementId: "G-4LP8QCB1HZ"
-    };
-
-      // Firebaseを初期化
-      const app = initializeApp(firebaseConfig);
-      // 各サービス（認証、データベース）を使えるように準備
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-
-      // ★他のJSファイルからFirebaseの機能を使えるように、グローバルな場所に保存する
-      window.firebaseTools = {
-          auth,
-          db,
-          signInAnonymously,
-          collection,
-          doc,
-          getDoc,
-          setDoc,
-          getDocs,
-          query,
-          orderBy,
-          limit
-      };
-    </script>
-    </body>
-</html>
 <body>
     <h1>ふくおか探訪ゲーム</h1>
 
@@ -94,6 +50,31 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+      import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+      import { getFirestore, collection, doc, getDoc, setDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBekQh7_Osc13c4FvCX4Smm70MX7Z_f5ao",
+        authDomain: "fukuoka-rpg.firebaseapp.com",
+        projectId: "fukuoka-rpg",
+        storageBucket: "fukuoka-rpg.appspot.com",
+        messagingSenderId: "104366485937",
+        appId: "1:104366485937:web:3549cccbefe5b4f9cd0d90",
+        measurementId: "G-4LP8QCB1HZ"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      window.firebaseTools = {
+          auth, db, signInAnonymously, collection, doc, getDoc, setDoc, getDocs, query, orderBy, limit
+      };
+    </script>
+
     <script type="module" src="game.js"></script>
 
 </body>
