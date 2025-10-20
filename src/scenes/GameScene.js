@@ -1,3 +1,5 @@
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby_AExrSSQwr2T3h1JjNseMzO3j1MTiJLnqDCYJkvxT5dukoY007kje9x1D_fx25kJWQQ/exec';
+
 import { spots } from '../data/spots.js';
 
 export class GameScene extends Phaser.Scene {

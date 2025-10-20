@@ -56,11 +56,13 @@
       import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
       import { getFirestore, collection, doc, getDoc, setDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
+      // ★★★ これが唯一の正しい設定です ★★★
       const firebaseConfig = {
         apiKey: "AIzaSyBekQh7_Osc13c4FvCX4Smm70MX7Z_f5ao",
         authDomain: "fukuoka-rpg.firebaseapp.com",
         projectId: "fukuoka-rpg",
-        storageBucket: "fukuoka-rpg.appspot.com",
+        // ★★★ v9 SDKでは .appspot.com が正しい形式です ★★★
+        storageBucket: "fukuoka-rpg.appspot.com", 
         messagingSenderId: "104366485937",
         appId: "1:104366485937:web:3549cccbefe5b4f9cd0d90",
         measurementId: "G-4LP8QCB1HZ"

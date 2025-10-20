@@ -10,6 +10,8 @@ function waitForFirebase() {
     });
 }
 
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby_AExrSSQwr2T3h1JjNseMzO3j1MTiJLnqDCYJkvxT5dukoY007kje9x1D_fx25kJWQQ/exec';
+
 // ページの読み込みが完了したら、ランキングの表示処理を開始
 document.addEventListener('DOMContentLoaded', async () => {
     const rankingList = document.getElementById('ranking-list');

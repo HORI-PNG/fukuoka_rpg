@@ -13,7 +13,7 @@ const config = {
     },
     scene: [GameScene, QuizScene]
 };
-const game = new Phaser.Game(config);
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby_AExrSSQwr2T3h1JjNseMzO3j1MTiJLnqDCYJkvxT5dukoY007kje9x1D_fx25kJWQQ/exec';
 
 /**
  * ログインしているユーザーのデータをFirebaseから取得する
