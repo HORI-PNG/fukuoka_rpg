@@ -55,6 +55,15 @@ export class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.spotObjects, this.onSpotOverlap, null, this);
         
         this.updateItemBox();
+        
+        // ミニゲームから戻ってきたときの報酬受け取り処理
+        const urlParams = new URLSearchParams(window.location.search);
+        const reward = urlParams.get('reward');
+        if (reward) {
+            this.addItem(reward);
+            // URLからパラメータを消してリロード対策
+            window.history.replaceState({}, document.title, window.location.pathname); 
+        }
 
         // ★★★ここが最重要ポイント(1/2)★★★
         // ゲーム画面が表示されたとき（＝ミニゲームから戻ってきたとき）に実行される

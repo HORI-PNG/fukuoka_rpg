@@ -13,116 +13,142 @@ const config = {
     },
     scene: [GameScene, QuizScene]
 };
+
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby_AExrSSQwr2T3h1JjNseMzO3j1MTiJLnqDCYJkvxT5dukoY007kje9x1D_fx25kJWQQ/exec';
 
-/**
- * ログインしているユーザーのデータをFirebaseから取得する
- * @param {string} uid - ユーザーの一意なID
- * @returns {Promise<object>} プレイヤーのデータ
- */
-async function getPlayerData(uid) {
-    // index.htmlで準備したFirebaseの道具箱から、必要な道具を取り出す
-    const { db, doc, getDoc } = window.firebaseTools;
-    
-    // 'players'というコレクション(棚)から、ユーザーID(uid)という名前のドキュメント(ファイル)を探す
-    const playerDocRef = doc(db, 'players', uid);
-    const docSnap = await getDoc(playerDocRef);
+let currentPlayer = {
+    userId: null,
+    name: '名無し',
+    score: 0,
+    items: []
+};
 
-    if (docSnap.exists()) {
-        // もしファイルが存在すれば、その中身を返す
-        return docSnap.data();
-    } else {
-        // なければ、新しいプレイヤー用の初期データを作成して返す
-        return {
-            name: sessionStorage.getItem('currentPlayerName') || '名無し',
-            score: 0,
-            items: []
-        };
+function getPlayerId() {
+    let userId = localStorage.getItem('fukuokaRpgUserId');
+    if (!userId) {
+        userId = 'user_' + Date.now() + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('fukuokaRpgUserId', userId);
+    }
+    return userId;
+}
+
+async function getPlayerData(userId) {
+    try {
+        const response = await fetch(`${GAS_WEB_APP_URL}?action=getPlayer&userId=${userId}`);
+        const result = await response.json();
+        if (result.status === 'success' && result.data) {
+            return result.data;
+        }
+        return null;
+    } catch (error) {
+        console.error('プレイヤーデータの取得に失敗:', error);
+        return null;
     }
 }
 
-/**
- * ゲームを開始し、UIをセットアップする関数
- * @param {object} user - Firebaseの認証ユーザーオブジェクト
- * @param {string} playerName - 入力されたプレイヤー名
- */
-async function setupGame(user, playerName) {
-    // ユーザーIDと名前を一時的に保存
-    sessionStorage.setItem('currentPlayerUID', user.uid);
-    sessionStorage.setItem('currentPlayerName', playerName);
-
-    // Firebaseからこのプレイヤーのデータを読み込む
-    const playerData = await getPlayerData(user.uid);
-    
-    // もしデータベースに保存されている名前と入力された名前が違えば、新しい名前で更新する
-    if (playerData.name !== playerName) {
-        const { db, doc, setDoc } = window.firebaseTools;
-        // { merge: true } を付けることで、スコアやアイテムを消さずに名前だけを更新できる
-        await setDoc(doc(db, 'players', user.uid), { name: playerName }, { merge: true });
+async function savePlayerData(player) {
+    try {
+        await fetch(GAS_WEB_APP_URL, {
+            method: 'POST',
+            // mode: 'no-cors' を削除
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Content-Typeを修正
+            body: JSON.stringify({ action: 'updatePlayer', ...player })
+        });
+    } catch (error) {
+        console.error('プレイヤーデータの保存に失敗:', error);
     }
+}
 
-    // 画面の表示を更新
+async function setupGame(playerName) {
     document.getElementById('current-player').textContent = playerName;
-    document.getElementById('current-score').textContent = playerData.score;
+    document.getElementById('current-score').textContent = currentPlayer.score;
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('game-container').style.display = 'block';
     document.getElementById('game-info').style.display = 'block';
 
-    // (リセットボタンの処理は、Firebase化に伴い一旦コメントアウトします。後で復活させます)
+    if (currentPlayer.name !== playerName) {
+        currentPlayer.name = playerName;
+        await savePlayerData(currentPlayer);
+    }
+    
+    // Phaserゲームを起動
+    const game = new Phaser.Game(config);
 }
 
-// --- UI操作 ---
-window.addEventListener('load', () => {
-    // (ミニゲームからの報酬受け取り処理は変更なし)
-    const urlParams = new URLSearchParams(window.location.search);
-    const reward = urlParams.get('reward');
-    if (reward) {
-        sessionStorage.setItem('pendingReward', reward);
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
+window.addEventListener('load', async () => {
+    const startScreen = document.getElementById('start-screen');
     const startButton = document.getElementById('start-button');
     const playerNameInput = document.getElementById('player-name');
+
+    // --- 最初にすべてのボタンやキーの機能を設定 ---
     
-    // サーバーに接続中であることがわかるように、ボタンを一時的に無効化
-    startButton.disabled = true;
-    startButton.textContent = 'サーバーに接続中...';
-
-    // ★Firebaseの匿名認証でログインを試みる
-    const { auth, signInAnonymously } = window.firebaseTools;
-    signInAnonymously(auth)
-        .then((userCredential) => {
-            // ログインに成功！
-            const user = userCredential.user;
-            console.log("匿名認証に成功しました。ユーザーID:", user.uid);
-            
-            // スタートボタンを押せるようにする
-            startButton.disabled = false;
-            startButton.textContent = 'ゲームを開始する';
-
-            // スタートボタンがクリックされたときの処理
-            startButton.addEventListener('click', () => {
-                const playerName = playerNameInput.value;
-                if (!playerName) {
-                    alert('プレイヤー名を入力してください。');
-                    return;
-                }
-                // 取得したユーザー情報とプレイヤー名でゲームを開始
-                setupGame(user, playerName);
-            });
-        })
-        .catch((error) => {
-            // ログインに失敗した場合
-            console.error("匿名認証エラー:", error);
-            startButton.textContent = '接続に失敗しました';
-            alert("サーバーへの接続に失敗しました。ページを再読み込みしてください。");
+    // リセットボタンの機能
+    const resetButton = document.getElementById('reset-button');
+    if (resetButton) {
+        resetButton.addEventListener('click', () => {
+            if (confirm('本当にすべてのデータをリセットしますか？')) {
+                localStorage.removeItem('fukuokaRpgUserId');
+                window.location.reload();
+            }
         });
-    
-    // (アイテムボックス表示の処理は変更なし)
+    }
+
+    // Eキーでアイテムボックスを開く機能
     document.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 'e') {
             const itemBox = document.getElementById('item-box');
-            itemBox.style.display = itemBox.style.display === 'block' ? 'none' : 'block';
+            if(itemBox) {
+                itemBox.style.display = itemBox.style.display === 'block' ? 'none' : 'block';
+            }
         }
     });
+
+    // --- プレイヤーIDをチェックして処理を分岐 ---
+    let userId = localStorage.getItem('fukuokaRpgUserId');
+    
+    if (userId) {
+        // 【2回目以降のプレイヤーの場合】
+        startScreen.style.display = 'none'; // スタート画面を即座に隠す
+        
+        const savedData = await getPlayerData(userId);
+        if (savedData) {
+            currentPlayer = { ...currentPlayer, ...savedData };
+            currentPlayer.userId = userId;
+            setupGame(currentPlayer.name); // 取得した名前で直接ゲームを開始
+        } else {
+            // もしIDはあるのにデータが取得できない場合は、スタート画面に戻す
+            startScreen.style.display = 'flex';
+        }
+
+    } else {
+        // 【新規プレイヤーの場合】
+        startScreen.style.display = 'flex'; // スタート画面を表示
+    }
+
+    // スタートボタンがクリックされたときの処理（新規プレイヤー向け）
+    startButton.addEventListener('click', () => {
+        const playerName = playerNameInput.value;
+        if (!playerName) {
+            alert('プレイヤー名を入力してください。');
+            return;
+        }
+        // 新しいIDを発行してゲームを開始
+        currentPlayer.userId = getPlayerId();
+        setupGame(playerName);
+    });
 });
+
+window.gameApi = {
+    updateScore: async (points) => {
+        currentPlayer.score += points;
+        document.getElementById('current-score').textContent = currentPlayer.score;
+        await savePlayerData(currentPlayer);
+        return currentPlayer.score;
+    },
+    addItem: async (itemName) => {
+        if (!currentPlayer.items.includes(itemName)) {
+            currentPlayer.items.push(itemName);
+            await savePlayerData(currentPlayer);
+        }
+    }
+};
