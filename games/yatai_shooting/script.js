@@ -59,8 +59,8 @@ canvas.addEventListener('click', (e) => {
 // マップに戻るボタンの処理
 const backButton = document.getElementById('back-to-map');
 backButton.addEventListener('click', () => {
-    // ★重要：URLパラメータを付けてマップ画面に戻る
-    window.location.href = '../../index.html?reward=ラーメン';
+    // ★修正：シンプルにマップのHTMLに戻るだけにする
+    window.location.href = '../../index.html';
 });
 
 // ゲーム開始

@@ -16,23 +16,18 @@ export class GameScene extends Phaser.Scene {
         const map = this.add.image(400, 300, 'map');
         map.setDisplaySize(800, 600);
 
-        // デバッグ用のグラフィックオブジェクトを作成（円を描画するように変更）
-        const debugGraphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000ff, alpha: 0.5 } }); // 線で円を描くスタイル
+        const debugGraphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000ff, alpha: 0.5 } });
 
         this.spotObjects = this.physics.add.staticGroup();
         spots.forEach(spot => {
-            // 当たり判定の半径を spot の幅の半分に設定
             const radius = spot.width / 2;
-
             const spotObject = this.spotObjects.create(spot.x, spot.y, null)
-                .setCircle(radius) // 当たり判定を円形に設定
+                .setCircle(radius)
                 .setVisible(false);
             spotObject.name = spot.name;
             spotObject.reward = spot.reward;
             spotObject.url = spot.url;
             spotObject.type = spot.type;
-
-            // 中心座標と半径を指定して円を描画
             debugGraphics.strokeCircle(spot.x, spot.y, radius);
         });
 
@@ -56,7 +51,18 @@ export class GameScene extends Phaser.Scene {
         this.setupButtonEvents();
 
         this.physics.add.overlap(this.player, this.spotObjects, this.onSpotOverlap, null, this);
+        
         this.updateItemBox();
+
+        // ★★★ここが最重要ポイント(1/2)★★★
+        // ゲーム画面が表示されたとき（＝ミニゲームから戻ってきたとき）に実行される
+        const pendingReward = sessionStorage.getItem('pendingReward');
+        if (pendingReward) {
+            // 保留されていた報酬があれば、アイテムを追加してメッセージを表示
+            this.addItem(pendingReward, true);
+            // 処理後に削除し、重複を防ぐ
+            sessionStorage.removeItem('pendingReward');
+        }
     }
 
     update() {
@@ -87,8 +93,7 @@ export class GameScene extends Phaser.Scene {
             this.player.anims.play('stand', true);
         }
     }
-
-    // (setupButtonEvents 以降の関数は変更ありません)
+    
     setupButtonEvents() {
         const buttonMapping = { 'btn-up': 'up', 'btn-down': 'down', 'btn-left': 'left', 'btn-right': 'right' };
         for (const [buttonId, direction] of Object.entries(buttonMapping)) {
@@ -101,35 +106,42 @@ export class GameScene extends Phaser.Scene {
         }
     }
     
+    // ★★★ここが最重要ポイント(2/2)★★★
     onSpotOverlap(player, spot) {
         if (!sessionStorage.getItem(`visited_${spot.name}`)) {
             sessionStorage.setItem(`visited_${spot.name}`, 'true');
 
-            // spotにURLがあり、それが 'http' で始まらない（ローカルファイルである）場合
-            if (spot.url && !spot.url.startsWith('http')) {
-                // そのページに移動する
+            if (spot.url) {
+                // アイテムはここでは獲得せず、名前だけを一時的に記憶させる
+                sessionStorage.setItem('pendingReward', spot.reward);
+                // すぐにミニゲームのURLに移動する
                 window.location.href = spot.url;
             } else {
-                // URLがないクイズなどの場合（従来の処理）
+                // URLがないクイズはこちらで処理
                 this.scene.pause();
-                if (spot.type === 'memory') {
-                    this.scene.launch('MemoryScene', { spotName: spot.name, reward: spot.reward });
-                } else {
-                    this.scene.launch('QuizScene', { spotName: spot.name, reward: spot.reward });
-                }
+                this.scene.launch('QuizScene', { spotName: spot.name, reward: spot.reward });
             }
         }
     }
 
-    addItem(itemName) {
-        if (!window.PlayerItems) { window.PlayerItems = JSON.parse(localStorage.getItem('playerItems')) || []; }
-        if (!window.PlayerItems.includes(itemName)) {
-            window.PlayerItems.push(itemName);
-            localStorage.setItem('playerItems', JSON.stringify(window.PlayerItems));
-            this.updateItemBox();
-            alert(`「${itemName}」を手に入れた！`);
+    /**
+     * アイテムを追加する
+     * @param {string} itemName - 追加するアイテム名
+     * @param {boolean} [showAlert=true] - trueの場合、alertで通知する
+     */
+    addItem(itemName, showAlert = true) {
+        let currentItems = JSON.parse(localStorage.getItem('playerItems')) || [];
+        if (!currentItems.includes(itemName)) {
+            currentItems.push(itemName);
+            localStorage.setItem('playerItems', JSON.stringify(currentItems));
+            
+            if (showAlert) {
+                alert(`「${itemName}」を手に入れた！`);
+            }
         }
+        this.updateItemBox();
     }
+
     updateItemBox() {
         const itemsDiv = document.getElementById('items');
         itemsDiv.innerHTML = '';

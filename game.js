@@ -64,16 +64,26 @@ function setupGame(playerName) {
 
 // --- UI操作 ---
 window.addEventListener('load', () => {
+    // ▼▼▼ ここからが重要 ▼▼▼
+    // URLから報酬パラメータを取得し、セッションストレージに保存する
+    const urlParams = new URLSearchParams(window.location.search);
+    const reward = urlParams.get('reward');
+    if (reward) {
+        // 報酬を一時的に保存
+        sessionStorage.setItem('pendingReward', reward);
+        // URLからパラメータを削除して、リロード時に再度追加されるのを防ぐ
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    // ▲▲▲ ここまで ▲▲▲
+
     const currentPlayer = sessionStorage.getItem('currentPlayer');
     const startButton = document.getElementById('start-button');
     const playerNameInput = document.getElementById('player-name');
 
-    // すでにプレイヤー名が保存されていれば、すぐにゲームを開始
     if (currentPlayer) {
         setupGame(currentPlayer);
     }
 
-    // スタートボタンがクリックされたときの処理
     startButton.addEventListener('click', () => {
         const playerName = playerNameInput.value;
         if (!playerName) {
@@ -83,30 +93,6 @@ window.addEventListener('load', () => {
         setupGame(playerName);
     });
 
-    function checkForReward() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const reward = urlParams.get('reward');
-
-        if (reward) {
-            // ローカルストレージから現在のアイテムリストを取得
-            const currentItems = JSON.parse(localStorage.getItem('playerItems')) || [];
-            
-            // アイテムがまだリストになければ追加
-            if (!currentItems.includes(reward)) {
-                currentItems.push(reward);
-                localStorage.setItem('playerItems', JSON.stringify(currentItems));
-                alert(`「${reward}」を手に入れた！`);
-            }
-            
-            // URLからパラメータを削除して、リロード時に再度追加されるのを防ぐ
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }
-
-    // ページ読み込み時に報酬をチェックする
-    checkForReward();
-
-    // アイテムボックスの表示切り替え (Eキー)
     document.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 'e') {
             const itemBox = document.getElementById('item-box');

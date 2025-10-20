@@ -1,0 +1,10 @@
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBekQh7_Osc13c4FvCX4Smm70MX7Z_f5ao",
+  authDomain: "fukuoka-rpg.firebaseapp.com",
+  projectId: "fukuoka-rpg",
+  storageBucket: "fukuoka-rpg.firebasestorage.app",
+  messagingSenderId: "104366485937",
+  appId: "1:104366485937:web:3549cccbefe5b4f9cd0d90",
+  measurementId: "G-4LP8QCB1HZ"
+};
