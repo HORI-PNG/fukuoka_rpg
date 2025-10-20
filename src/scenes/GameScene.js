@@ -157,11 +157,11 @@ export class GameScene extends Phaser.Scene {
         // game.jsから現在のプレイヤー情報を取得
         const player = window.gameApi.getCurrentPlayer();
         
-        if (player && player.items) {
-            player.items.forEach(item => {
+        if (player && Array.isArray(player.items)) {
+            player.items.forEach(itemName => {
                 const itemElement = document.createElement('div');
                 itemElement.className = 'item';
-                itemElement.textContent = item;
+                itemElement.textContent = itemName;
                 itemsDiv.appendChild(itemElement);
             });
         }

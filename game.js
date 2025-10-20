@@ -131,11 +131,15 @@ window.gameApi = {
         await savePlayerData(currentPlayer);
     },
     addItem: async (itemName) => {
-        if (!currentPlayer) return;
+        if (!Array.isArray(currentPlayer.items)) {
+            currentPlayer.items = [];
+        }
+        // すでに持っているアイテムでなければ、リストに追加する
         if (!currentPlayer.items.includes(itemName)) {
             currentPlayer.items.push(itemName);
-            await savePlayerData(currentPlayer);
         }
+        // 更新されたプレイヤーデータ全体をサーバーに保存する
+        await savePlayerData(currentPlayer);
     },
     // GameSceneからプレイヤーデータを取得するための関数を追加
     getCurrentPlayer: () => currentPlayer
