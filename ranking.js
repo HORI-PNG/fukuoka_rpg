@@ -1,22 +1,48 @@
-document.addEventListener('DOMContentLoaded', () => {
+// window.firebaseTools が準備できるまで待つための処理
+function waitForFirebase() {
+    return new Promise((resolve) => {
+        const interval = setInterval(() => {
+            if (window.firebaseTools) {
+                clearInterval(interval);
+                resolve(window.firebaseTools);
+            }
+        }, 100); // 0.1秒ごとにチェック
+    });
+}
+
+// ページの読み込みが完了したら、ランキングの表示処理を開始
+document.addEventListener('DOMContentLoaded', async () => {
     const rankingList = document.getElementById('ranking-list');
+    rankingList.innerHTML = '<li>ランキングを読み込み中...</li>';
 
-    // ローカルストレージからスコアを取得
-    const scores = JSON.parse(localStorage.getItem('gameScores')) || {};
+    try {
+        // Firebaseの準備が整うのを待つ
+        const { db, collection, query, orderBy, limit, getDocs } = await waitForFirebase();
 
-    // スコアを配列に変換して、降順（ポイントの高い順）にソート
-    const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+        // 'players'コレクションを、スコア(score)が高い順(desc)に、上位10件(limit)取得するクエリを作成
+        const q = query(collection(db, "players"), orderBy("score", "desc"), limit(10));
 
-    // 上位3名を表示
-    const top3 = sortedScores.slice(0, 3);
+        const querySnapshot = await getDocs(q);
+        
+        // ランキングリストを一度空にする
+        rankingList.innerHTML = ''; 
 
-    if (top3.length === 0) {
-        rankingList.innerHTML = '<li>まだ誰もプレイしていません。</li>';
-    } else {
-        top3.forEach(([name, score], index) => {
+        if (querySnapshot.empty) {
+            rankingList.innerHTML = '<li>まだ誰もプレイしていません。</li>';
+            return;
+        }
+
+        let rank = 1;
+        querySnapshot.forEach((doc) => {
+            const playerData = doc.data();
             const listItem = document.createElement('li');
-            listItem.textContent = `${index + 1}位: ${name} - ${score}ポイント`;
+            listItem.textContent = `${rank}位: ${playerData.name} - ${playerData.score}ポイント`;
             rankingList.appendChild(listItem);
+            rank++;
         });
+
+    } catch (error) {
+        console.error("ランキングの読み込みに失敗しました:", error);
+        rankingList.innerHTML = '<li>ランキングの読み込みに失敗しました。</li>';
     }
 });

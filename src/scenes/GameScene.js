@@ -33,11 +33,11 @@ export class GameScene extends Phaser.Scene {
 
         this.anims.create({
             key: 'stand',
-            frames: [ { key: 'player_stand' } ],
+            frames: [{ key: 'player_stand' }],
         });
         this.anims.create({
             key: 'walk',
-            frames: [ { key: 'player_stand' }, { key: 'player_walk' } ],
+            frames: [{ key: 'player_stand' }, { key: 'player_walk' }],
             frameRate: 4,
             repeat: -1
         });
@@ -129,28 +129,56 @@ export class GameScene extends Phaser.Scene {
      * @param {string} itemName - 追加するアイテム名
      * @param {boolean} [showAlert=true] - trueの場合、alertで通知する
      */
-    addItem(itemName, showAlert = true) {
-        let currentItems = JSON.parse(localStorage.getItem('playerItems')) || [];
-        if (!currentItems.includes(itemName)) {
-            currentItems.push(itemName);
-            localStorage.setItem('playerItems', JSON.stringify(currentItems));
-            
-            if (showAlert) {
-                alert(`「${itemName}」を手に入れた！`);
+    async addItem(itemName, showAlert = true) {
+        const currentPlayerUID = sessionStorage.getItem('currentPlayerUID');
+        if (!currentPlayerUID) return;
+
+        const { db, doc, getDoc, setDoc } = window.firebaseTools;
+        const playerDocRef = doc(db, 'players', currentPlayerUID);
+
+        try {
+            const docSnap = await getDoc(playerDocRef);
+            const currentItems = docSnap.exists() ? docSnap.data().items || [] : [];
+
+            if (!currentItems.includes(itemName)) {
+                currentItems.push(itemName);
+                await setDoc(playerDocRef, { items: currentItems }, { merge: true });
+
+                if (showAlert) {
+                    alert(`「${itemName}」を手に入れた！`);
+                }
             }
+            // データベース更新後に、画面の表示も更新
+            this.updateItemBox();
+        } catch (error) {
+            console.error("アイテムの追加に失敗しました:", error);
         }
-        this.updateItemBox();
     }
 
-    updateItemBox() {
+    async updateItemBox() {
+        const currentPlayerUID = sessionStorage.getItem('currentPlayerUID');
         const itemsDiv = document.getElementById('items');
         itemsDiv.innerHTML = '';
-        const currentItems = JSON.parse(localStorage.getItem('playerItems')) || [];
-        currentItems.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.className = 'item';
-            itemElement.textContent = item;
-            itemsDiv.appendChild(itemElement);
-        });
+
+        if (!currentPlayerUID) return;
+
+        const { db, doc, getDoc } = window.firebaseTools;
+        const playerDocRef = doc(db, 'players', currentPlayerUID);
+        
+        try {
+            const docSnap = await getDoc(playerDocRef);
+            if (docSnap.exists()) {
+                const playerItems = docSnap.data().items || [];
+                playerItems.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'item';
+                    itemElement.textContent = item;
+                    itemsDiv.appendChild(itemElement);
+                });
+            }
+        } catch (error) {
+            console.error("アイテムボックスの更新に失敗しました:", error);
+        }
     }
 }
+    

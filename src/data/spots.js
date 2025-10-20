@@ -22,8 +22,8 @@ export const spots = [
     {
         name: '福岡タワー',
         type: 'quiz',
-        x: 380,
-        y: 340,
+        x: 400,
+        y: 400,
         width: 50,
         height: 100,
         url: 'https://www.fukuokatower.co.jp/',
