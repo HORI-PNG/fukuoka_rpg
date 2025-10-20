@@ -19,11 +19,11 @@ let currentPlayer = null;
 
 async function loginAndGetData(playerName) {
     try {
-        const response = await fetch(`${GAS_WEB_APP_URL}?action=getPlayer&name=${playerName}`);
+        const response = await fetch(`${GAS_WEB_APP_URL}?action=getPlayer&name=${encodeURLComponent(playerName)}`);
         const result = await response.json();
         return (result.status === 'success' && result.data) ? result.data : null;
     } catch (error) {
-        console.error('プレイヤーデータの取得に失敗:', error);
+        console.error('データエラー:', error);
         return null;
     }
 }
@@ -36,7 +36,7 @@ async function savePlayerData(player) {
             body: JSON.stringify({ action: 'updatePlayer', ...player })
         });
     } catch (error) {
-        console.error('プレイヤーデータの保存に失敗:', error);
+        console.error('データ保存エラー:', error);
     }
 }
 
@@ -46,12 +46,11 @@ function setupGame(playerData) {
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('game-container').style.display = 'block';
     document.getElementById('game-info').style.display = 'block';
-    
     const game = new Phaser.Game(config);
 }
 
 window.addEventListener('load', () => {
-    const startScreen = document.getElementById('start-screen');
+    // const startScreen = document.getElementById('start-screen');
     const startButton = document.getElementById('start-button');
     const playerNameInput = document.getElementById('player-name');
     const resetButton = document.getElementById('reset-button');
@@ -70,15 +69,15 @@ window.addEventListener('load', () => {
     if (deleteButton) {
         deleteButton.addEventListener('click', async () => {
             const player = window.gameApi.getCurrentPlayer();
-            if (!player) { return; }
-            if (confirm(`本当にプレイヤー「${player.name}」の全データを削除しますか？\nこの操作は元に戻せません。`)) {
+            if (!currentPlayer) return;
+            if (confirm(`本当にプレイヤー「${currentPlayer.name}」の全データを削除しますか？\nこの操作は元に戻せません。`)) {
                 try {
                     await fetch(GAS_WEB_APP_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify({ action: 'deletePlayer', name: player.name })
+                        body: JSON.stringify({ action: 'deletePlayer', name: currentPlayer.name })
                     });
-                    alert(`「${player.name}」のデータを完全に削除しました。`);
+                    alert(`「${currentPlayer.name}」のデータを完全に削除しました。`);
                     sessionStorage.clear();
                     window.location.reload();
                 } catch (error) {
@@ -131,6 +130,7 @@ window.gameApi = {
         await savePlayerData(currentPlayer);
     },
     addItem: async (itemName) => {
+        if (!currentPlayer) return;
         if (!Array.isArray(currentPlayer.items)) {
             currentPlayer.items = [];
         }
