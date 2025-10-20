@@ -60,7 +60,7 @@ canvas.addEventListener('click', (e) => {
 const backButton = document.getElementById('back-to-map');
 backButton.addEventListener('click', () => {
     // ★修正：シンプルにマップのHTMLに戻るだけにする
-    window.location.href = '../../index.html';
+    window.location.href = '../../index.html?reward=ラーメン&success=true';
 });
 
 // ゲーム開始

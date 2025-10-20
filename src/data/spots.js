@@ -66,7 +66,7 @@ export const spots = [
         y: 500,
         width: 100,
         height: 100,
-        url: './games/yatai_shooting/index.html', // ★新しいゲームのHTMLへのパスを指定
-        reward: 'ラーメン' // ★script.jsで指定したアイテム名と合わせる
+        url: './games/yatai_shooting/index.html', 
+        reward: 'ラーメン' // 
     },
 ];

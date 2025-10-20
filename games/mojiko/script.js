@@ -1,4 +1,3 @@
-// カードの絵柄（今回は絵文字で代用）
 const cardData = ['1', '2', '3', '4', '5', '6'];
 // const cardData = [
 //     { id: 'banana', img: './images/banana.png' },
@@ -107,7 +106,7 @@ function showResult() {
     // マップに戻るボタンの処理
     backButton.addEventListener('click', () => {
         // ★重要：URLパラメータを付けてマップ画面に戻る
-        window.location.href = '../../index.html?reward=焼きカレー';
+        window.location.href = '../../index.html?reward=焼きカレー&success=true';
     });
 }
 

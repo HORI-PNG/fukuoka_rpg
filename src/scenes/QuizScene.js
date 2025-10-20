@@ -6,32 +6,6 @@ import { quizzes } from '../data/quizzes.js';
  * @param {number} points - 加算するポイント
  * @returns {Promise<number>} - 更新後の合計スコア
  */
-async function saveScore(uid, points) {
-    const { db, doc, getDoc, setDoc } = window.firebaseTools;
-    const playerDocRef = doc(db, 'players', uid);
-
-    try {
-        // まず現在のデータを取得
-        const docSnap = await getDoc(playerDocRef);
-        let currentScore = 0;
-        if (docSnap.exists()) {
-            currentScore = docSnap.data().score || 0;
-        }
-
-        // 新しいスコアを計算
-        const newScore = currentScore + points;
-
-        // 新しいスコアを、既存のデータと統合(merge)する形で保存
-        await setDoc(playerDocRef, { score: newScore }, { merge: true });
-
-        return newScore;
-
-    } catch (error) {
-        console.error("スコアの保存に失敗しました:", error);
-        return 0; // エラーの場合は0を返す
-    }
-}
-
 
 export class QuizScene extends Phaser.Scene {
     constructor() {
@@ -64,20 +38,19 @@ export class QuizScene extends Phaser.Scene {
 
     async checkAnswer(selectedChoice, correctAnswer) {
         const gameScene = this.scene.get('GameScene');
-        const currentPlayerUID = sessionStorage.getItem('currentPlayerUID');
         let resultText = '';
 
         if (selectedChoice === correctAnswer) {
-            resultText = '正解！ 🎉\n1ポイント獲得！';
+            resultText = '正解！ \n1ポイント獲得！';
+            // GameSceneのaddItemを呼び出す
             gameScene.addItem(this.reward);
         
-            if (currentPlayerUID) {
-                // ★非同期処理になったため await を使う
-                const newScore = await saveScore(currentPlayerUID, 1);
-                document.getElementById('current-score').textContent = newScore;
+            // game.jsで用意したAPIを呼び出してスコアを更新
+            if (window.gameApi && typeof window.gameApi.updateScore === 'function') {
+                await window.gameApi.updateScore(1);
             }
         } else {
-            resultText = `残念、不正解...\n正解は「${correctAnswer}」でした。`;
+            resultText = `不正解...\n正解は「${correctAnswer}」でした。`;
         }
     
         this.add.text(400, 300, resultText, { fontSize: '32px', fill: '#fff', align: 'center' }).setOrigin(0.5);

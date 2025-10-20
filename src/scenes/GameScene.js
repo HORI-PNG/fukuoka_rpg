@@ -55,17 +55,21 @@ export class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.spotObjects, this.onSpotOverlap, null, this);
         
         this.updateItemBox();
-        
+
         // ミニゲームから戻ってきたときの報酬受け取り処理
         const urlParams = new URLSearchParams(window.location.search);
         const reward = urlParams.get('reward');
+        const isSuccess = urlParams.get('success') === 'true';
         if (reward) {
-            this.addItem(reward);
+            if (isSuccess) {
+                this.addItem(reward);
+            } else {
+                alert(`残念！「${reward}」は手に入らなかった…。`);
+            }
             // URLからパラメータを消してリロード対策
             window.history.replaceState({}, document.title, window.location.pathname); 
         }
 
-        // ★★★ここが最重要ポイント(1/2)★★★
         // ゲーム画面が表示されたとき（＝ミニゲームから戻ってきたとき）に実行される
         const pendingReward = sessionStorage.getItem('pendingReward');
         if (pendingReward) {
@@ -116,15 +120,12 @@ export class GameScene extends Phaser.Scene {
             }
         }
     }
-    
-    // ★★★ここが最重要ポイント(2/2)★★★
+
     onSpotOverlap(player, spot) {
         if (!sessionStorage.getItem(`visited_${spot.name}`)) {
             sessionStorage.setItem(`visited_${spot.name}`, 'true');
 
             if (spot.url) {
-                // アイテムはここでは獲得せず、名前だけを一時的に記憶させる
-                sessionStorage.setItem('pendingReward', spot.reward);
                 // すぐにミニゲームのURLに移動する
                 window.location.href = spot.url;
             } else {
@@ -140,55 +141,29 @@ export class GameScene extends Phaser.Scene {
      * @param {string} itemName - 追加するアイテム名
      * @param {boolean} [showAlert=true] - trueの場合、alertで通知する
      */
-    async addItem(itemName, showAlert = true) {
-        const currentPlayerUID = sessionStorage.getItem('currentPlayerUID');
-        if (!currentPlayerUID) return;
-
-        const { db, doc, getDoc, setDoc } = window.firebaseTools;
-        const playerDocRef = doc(db, 'players', currentPlayerUID);
-
-        try {
-            const docSnap = await getDoc(playerDocRef);
-            const currentItems = docSnap.exists() ? docSnap.data().items || [] : [];
-
-            if (!currentItems.includes(itemName)) {
-                currentItems.push(itemName);
-                await setDoc(playerDocRef, { items: currentItems }, { merge: true });
-
-                if (showAlert) {
-                    alert(`「${itemName}」を手に入れた！`);
-                }
-            }
-            // データベース更新後に、画面の表示も更新
-            this.updateItemBox();
-        } catch (error) {
-            console.error("アイテムの追加に失敗しました:", error);
+    async addItem(itemName) {
+        // game.jsで用意したAPIを呼び出す
+        if (window.gameApi && typeof window.gameApi.addItem === 'function') {
+            await window.gameApi.addItem(itemName);
+            alert(`「${itemName}」を手に入れた！`);
+            this.updateItemBox(); // 表示を更新
         }
     }
 
     async updateItemBox() {
-        const currentPlayerUID = sessionStorage.getItem('currentPlayerUID');
         const itemsDiv = document.getElementById('items');
         itemsDiv.innerHTML = '';
-
-        if (!currentPlayerUID) return;
-
-        const { db, doc, getDoc } = window.firebaseTools;
-        const playerDocRef = doc(db, 'players', currentPlayerUID);
         
-        try {
-            const docSnap = await getDoc(playerDocRef);
-            if (docSnap.exists()) {
-                const playerItems = docSnap.data().items || [];
-                playerItems.forEach(item => {
-                    const itemElement = document.createElement('div');
-                    itemElement.className = 'item';
-                    itemElement.textContent = item;
-                    itemsDiv.appendChild(itemElement);
-                });
-            }
-        } catch (error) {
-            console.error("アイテムボックスの更新に失敗しました:", error);
+        // game.jsから現在のプレイヤー情報を取得
+        const player = window.gameApi.getCurrentPlayer();
+        
+        if (player && player.items) {
+            player.items.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'item';
+                itemElement.textContent = item;
+                itemsDiv.appendChild(itemElement);
+            });
         }
     }
 }
