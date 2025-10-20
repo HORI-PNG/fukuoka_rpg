@@ -51,18 +51,15 @@ function setupGame(playerData) {
 }
 
 window.addEventListener('load', () => {
+    const startScreen = document.getElementById('start-screen');
     const startButton = document.getElementById('start-button');
     const playerNameInput = document.getElementById('player-name');
-
     const resetButton = document.getElementById('reset-button');
     if (resetButton) {
         resetButton.addEventListener('click', () => {
-            if (confirm('本当にすべてのデータをリセットし、ログイン画面に戻りますか？')) {
-                // 現在のログイン情報を削除
+            if (confirm('プレイヤーを切り替えますか？')) {
+                //　ログイン情報だけ削除
                 sessionStorage.removeItem('loggedInPlayer');
-                // 念のため、古いバージョンのIDも削除
-                localStorage.removeItem('fukuokaRpgUserId');
-                
                 // ページを再読み込みして、最初の状態に戻す
                 window.location.reload();
             }
@@ -73,34 +70,34 @@ window.addEventListener('load', () => {
     if (deleteButton) {
         deleteButton.addEventListener('click', async () => {
             const player = window.gameApi.getCurrentPlayer();
-            if (!player) {
-                alert('プレイヤーがログインしていません。');
-                return;
-            }
-
-            if (confirm(`本当にプレイヤー「${player.name}」のすべてのセーブデータをサーバーから削除しますか？\nこの操作は元に戻せません。`)) {
+            if (!player) { return; }
+            if (confirm(`本当にプレイヤー「${player.name}」の全データを削除しますか？\nこの操作は元に戻せません。`)) {
                 try {
-                    // サーバーに削除をリクエスト
                     await fetch(GAS_WEB_APP_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({ action: 'deletePlayer', name: player.name })
                     });
-                    
-                    alert(`プレイヤー「${player.name}」のデータを完全に削除しました。`);
-                    
-                    // 端末のログイン情報もクリアして、ページをリロード
-                    sessionStorage.removeItem('loggedInPlayer');
+                    alert(`「${player.name}」のデータを完全に削除しました。`);
+                    sessionStorage.clear();
                     window.location.reload();
-
                 } catch (error) {
-                    console.error('データの削除に失敗しました:', error);
                     alert('データの削除中にエラーが発生しました。');
                 }
             }
         });
     }
 
+    const loggedInPlayerJSON = sessionStorage.getItem('loggedInPlayer');
+    if (loggedInPlayerJSON) {
+        // ログイン済みなら、スタート画面を飛ばしてゲーム開始
+        currentPlayer = JSON.parse(loggedInPlayerJSON);
+        setupGame(currentPlayer);
+    } else {
+        // 未ログインなら、スタート画面を表示
+        startScreen.style.display = 'flex';
+    }
+    
     startButton.addEventListener('click', async () => {
         const playerName = playerNameInput.value.trim();
         if (!playerName) {
@@ -115,23 +112,14 @@ window.addEventListener('load', () => {
 
         if (!playerData) {
             // 新規プレイヤーの場合
-            playerData = { userId: null, name: playerName, score: 0, items: [] };
+            playerData = { userId: null, name: playerName, score: 0, items: {} };
         }
         
         currentPlayer = playerData;
         // sessionStorageにログイン情報を保存（タブを閉じるまで有効）
         sessionStorage.setItem('loggedInPlayer', JSON.stringify(currentPlayer));
-        
         setupGame(currentPlayer);
     });
-
-    // --- ページ読み込み時に、ログイン済みかチェック ---
-    const loggedInPlayerJSON = sessionStorage.getItem('loggedInPlayer');
-    if (loggedInPlayerJSON) {
-        currentPlayer = JSON.parse(loggedInPlayerJSON);
-        // スタート画面を飛ばして直接ゲームを開始
-        setupGame(currentPlayer);
-    }
 });
 
 // グローバルAPIの修正

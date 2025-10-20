@@ -1,0 +1,57 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: sans-serif;
+    background-color: #f0f8ff; /* 明るい青系の背景色 */
+}
+
+h1 {
+    color: #4682b4; /* スチールブルー */
+}
+
+.game-board {
+    width: 420px;
+    height: 320px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* カード間の隙間 */
+    perspective: 1000px; /* 3D効果のための視点 */
+}
+
+.card {
+    width: 90px;
+    height: 90px;
+    background-color: #daa520; /* ゴールドっぽい色 */
+    border: 2px solid #8b4513; /* サドルブラウン */
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+}
+
+.card.flip {
+    transform: rotateY(180deg); /* Y軸を中心に180度回転（めくれるアニメーション） */
+    background-color: #6a5acd; /* めくれた後の色（スレートブルー） */
+}
+
+.result-area {
+    margin-top: 20px;
+    padding: 20px;
+    text-align: center;
+    background-color: white;
+    border: 2px solid #4682b4;
+    border-radius: 10px;
+}
+
+#back-to-map {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+}
