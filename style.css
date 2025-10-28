@@ -81,6 +81,16 @@ canvas {
     left: auto;
 }
 
+/* ... (80行目あたり) ... */
+#toggle-items-button {
+    position: fixed; bottom: 30px; 
+    /* left: 30px; ← ★ 変更前 (リセットボタンと重なる) */
+    left: 100px; /* ★ 変更後 (リセットボタンの隣) */
+    width: 60px; height: 60px;
+    font-size: 2em; background-color: rgba(255, 255, 255, 0.8);
+    border: 2px solid #555; border-radius: 50%; cursor: pointer; z-index: 100;
+}
+
 #controls button:active {
     background-color: rgba(200, 200, 200, 0.9); /* 押したときの色 */
 }

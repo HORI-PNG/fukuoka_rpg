@@ -1,11 +1,10 @@
-const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby_AExrSSQwr2T3h1JjNseMzO3j1MTiJLnqDCYJkvxT5dukoY007kje9x1D_fx25kJWQQ/exec';
-
 import { spots } from '../data/spots.js';
 
 export class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
         this.virtualKeys = { up: false, down: false, left: false, right: false };
+        this.isEnteringSpot = false; // スポットに入ったかどうかのフラグ
     }
 
     preload() {
@@ -54,6 +53,7 @@ export class GameScene extends Phaser.Scene {
 
         this.physics.add.overlap(this.player, this.spotObjects, this.onSpotOverlap, null, this);
         
+        // ゲーム開始時に updateItemBox を呼ぶ（game.js側で呼ばれるが念のため）
         this.updateItemBox();
 
         // ミニゲームから戻ってきたときの報酬受け取り処理
@@ -62,21 +62,12 @@ export class GameScene extends Phaser.Scene {
         const isSuccess = urlParams.get('success') === 'true';
         if (reward) {
             if (isSuccess) {
-                this.addItem(reward);
+                this.addItem(reward); // Supabase にアイテムを追加
             } else {
                 alert(`残念！「${reward}」は手に入らなかった…。`);
             }
             // URLからパラメータを消してリロード対策
             window.history.replaceState({}, document.title, window.location.pathname); 
-        }
-
-        // ゲーム画面が表示されたとき（＝ミニゲームから戻ってきたとき）に実行される
-        const pendingReward = sessionStorage.getItem('pendingReward');
-        if (pendingReward) {
-            // 保留されていた報酬があれば、アイテムを追加してメッセージを表示
-            this.addItem(pendingReward, true);
-            // 処理後に削除し、重複を防ぐ
-            sessionStorage.removeItem('pendingReward');
         }
     }
 
@@ -121,42 +112,56 @@ export class GameScene extends Phaser.Scene {
         }
     }
 
+    // onSpotOverlap を Supabase の訪問履歴（visited_spots）を参照するように変更
+    // onSpotOverlap を多重実行防止版に修正
     onSpotOverlap(player, spot) {
-        if (!sessionStorage.getItem(`visited_${spot.name}`)) {
-            sessionStorage.setItem(`visited_${spot.name}`, 'true');
-
+        // 既にシーン遷移中、またはプレイヤーAPIがなければ何もしない
+        if (this.isEnteringSpot || !window.gameApi) return;
+        const currentPlayer = window.gameApi.getCurrentPlayer();
+        if (!currentPlayer) return; // プレイヤー情報がなければ何もしない
+        // プレイヤーの訪問履歴（Supabaseからロードしたもの）をチェック
+        const visitedSpots = currentPlayer.visited_spots || [];
+        const hasVisited = visitedSpots.includes(spot.name);
+        if (!hasVisited) {
+            // フラグを立てて、多重実行を防ぐ
+            this.isEnteringSpot = true;
+            // 訪問履歴をDBに保存するAPI（game.js）を呼び出す
+            if (window.gameApi && typeof window.gameApi.addVisitedSpot === 'function') {
+                window.gameApi.addVisitedSpot(spot.name);
+            }
+            // シーン遷移
             if (spot.url) {
-                // すぐにミニゲームのURLに移動する
+            // ミニゲームへ遷移 (ページがリロードされるのでフラグは自動解除)
                 window.location.href = spot.url;
             } else {
-                // URLがないクイズはこちらで処理
+                // クイズシーンへ遷移 (GameSceneは pause されるだけ)
                 this.scene.pause();
+                // クイズシーンが終了(shutdown)したら、フラグを解除するリスナーを設定
                 this.scene.launch('QuizScene', { spotName: spot.name, reward: spot.reward });
             }
         }
     }
-
     /**
-     * アイテムを追加する
-     * @param {string} itemName - 追加するアイテム名
-     * @param {boolean} [showAlert=true] - trueの場合、alertで通知する
-     */
+     * アイテムを追加する
+     * @param {string} itemName - 追加するアイテム名
+     */
     async addItem(itemName) {
         // game.jsで用意したAPIを呼び出す
         if (window.gameApi && typeof window.gameApi.addItem === 'function') {
             await window.gameApi.addItem(itemName);
             alert(`「${itemName}」を手に入れた！`);
-            this.updateItemBox(); // 表示を更新
         }
     }
 
     async updateItemBox() {
+        // (この関数は game.js から直接呼ばれることはないが、
+        //  create() や addItem() から呼ばれるため残しておく)
         const itemsDiv = document.getElementById('items');
         itemsDiv.innerHTML = '';
-        
+
         // game.jsから現在のプレイヤー情報を取得
         const player = window.gameApi.getCurrentPlayer();
-        
+
         if (player && Array.isArray(player.items)) {
             player.items.forEach(itemName => {
                 const itemElement = document.createElement('div');
@@ -167,4 +172,3 @@ export class GameScene extends Phaser.Scene {
         }
     }
 }
-    
