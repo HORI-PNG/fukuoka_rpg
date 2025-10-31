@@ -104,7 +104,7 @@ async function savePlayerData(player) {
 function displayItems() {
     const itemsDiv = document.getElementById('items');
     const itemScoreSpan = document.getElementById('item-score');
-    if (!itemsDiv || itemScoreSpan) return;
+    if (!itemsDiv || !itemScoreSpan) return;
     itemsDiv.innerHTML = ''; // 中身をリセット
     if (currentPlayer && Array.isArray(currentPlayer.items) && currentPlayer.items.length > 0) {
         itemScoreSpan.textContent = currentPlayer.items.length;

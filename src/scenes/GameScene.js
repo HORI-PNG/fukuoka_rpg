@@ -16,34 +16,32 @@ export class GameScene extends Phaser.Scene {
     create() {
         const map = this.add.image(400, 300, 'map');
         map.setDisplaySize(800, 600);
+        map.setDepth(0); // 背景なので最も奥に配置
 
         // 訪問済スポットの色を定義
         const visitedColor = 0xffaaaa; // 薄い赤色
-        const defaultColor = 0x0000ff; // もともとの青色
+        const defaultColor = 0xfffcc; // 薄い黄色
 
         // 現在のプレイヤーの訪問履歴を取得
         const currentPlayer = window.gameApi.getCurrentPlayer();
         const visitedSpots = currentPlayer ? (currentPlayer.visited_spots || []) : [];
-        // デバッグ用の円を描画する Graphics オブジェクト
-        // ★ 既存の debugGraphics は削除またはコメントアウト
-        // const debugGraphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000ff, alpha: 0.5 } });
-
+        
         // 各スポットごとにGraphicsオブジェクトを作成
         this.spotObjects = this.physics.add.staticGroup();
         spots.forEach(spot => {
-            const radius = spot.width / 2;
-
-
             // スポットごとに個別のGraphicsオブジェクトを作成
             const spotGraphic = this.add.graphics();
+            spotGraphic.setDepth(1); // プレイヤーより後ろ、マップより前に配置
             const isVisited = visitedSpots.includes(spot.name);
             const spotColor = isVisited ? visitedColor : defaultColor;
-            spotGraphic.lineStyle(2, spotColor, 0.7); // 訪問済みかで色を変更
-            spotGraphic.strokeCircle(spot.x, spot.y, radius);
+            spotGraphic.fillStyle(spotColor, 0.5); // 50%で透過
+            const drawX = spot.x - spot.width / 2;
+            const drawY = spot.y - spot.height / 2;
+            spotGraphic.fillRect(drawX, drawY, spot.width, spot.height);
 
             // 物理判定用の見えないオブジェクトを作成
             const spotObject = this.spotObjects.create(spot.x, spot.y, null)
-                .setCircle(radius)
+                .setSize(spot.width, spot.height)
                 .setVisible(false);
             spotObject.name = spot.name;
             spotObject.reward = spot.reward;
@@ -52,6 +50,9 @@ export class GameScene extends Phaser.Scene {
 
             // 作成した Graphics を spotObject に関連付けておく (後で色を変える場合など)
             spotObject.graphic = spotGraphic;
+            // 当たり判定のサイズも保存しておくとonSpotOverlapで便利
+            spotObject.width = spot.width; // spot.jsのwidthを保持
+            spotObject.height = spot.height; // spot.jsのheightを保持
         });
 
         this.anims.create({
@@ -68,6 +69,7 @@ export class GameScene extends Phaser.Scene {
         this.player = this.physics.add.sprite(400, 300, 'player_stand');
         this.player.setDisplaySize(96, 96);
         this.player.setCollideWorldBounds(true);
+        this.player.setDepth(2); // プレイヤーは一番前
 
         this.cursors = this.input.keyboard.createCursorKeys();
         this.keys = this.input.keyboard.addKeys('W,A,S,D');
@@ -153,10 +155,13 @@ export class GameScene extends Phaser.Scene {
 
             // スポットの色を即座に変更
             if (spot.spotGraphic) {
-                const visitedColor = 0xffaaaa;
-                spot.spotGraphic.clear();
-                spot.spotGraphic.lineStyle(2, visitedColor, 0.7); // 新しい色で描画
-                spot.spotGraphic.strokeCircle(spot.x, spot.y, spot.width / 2);
+                const visitedColor = 0xffaaaa; // 薄い赤色
+                spot.spotGraphic.clear(); // 既存の描画をクリア
+                spot.graphic.fillStyle(visitedColor, 0.5);
+                // create時と同様に、中心座標から描画開始位置を計算
+                const drawX = spot.x - spot.width / 2;
+                const drawY = spot.y - spot.height / 2;
+                spot.graphic.fillRect(drawX, drawY, spot.width, spot.height);
             }
 
             // 訪問履歴をDBに保存するAPI（game.js）を呼び出す
