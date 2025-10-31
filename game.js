@@ -107,7 +107,7 @@ function displayItems() {
     if (!itemsDiv || itemScoreSpan) return;
     itemsDiv.innerHTML = ''; // 中身をリセット
     if (currentPlayer && Array.isArray(currentPlayer.items) && currentPlayer.items.length > 0) {
-        itemsScoreSpan.textContent = currentPlayer.items.length;
+        itemScoreSpan.textContent = currentPlayer.items.length;
         currentPlayer.items.forEach(itemName => {
             const itemElement = document.createElement('div');
             itemElement.className = 'item'; // (style.cssで定義済み)
@@ -115,7 +115,7 @@ function displayItems() {
             itemsDiv.appendChild(itemElement);
         });
     } else {
-        itemScoreqSpan.textContent = 0;
+        itemScoreSpan.textContent = 0;
         itemsDiv.textContent = 'まだアイテムを持っていません。';
     }
 }
