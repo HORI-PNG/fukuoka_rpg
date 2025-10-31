@@ -7,6 +7,10 @@ const config = {
     parent: 'game-container',
     width: 800,
     height: 600,
+    scale: {
+        mode: Phaser.Scale.FIT, // 縦横比を保ったまま、親要素（game-container）にフィットさせる
+        autoCenter: Phaser.Scale.CENTER_BOTH, // 親要素の中央に配置する
+    },
     physics: {
         default: 'arcade',
         arcade: { gravity: { y: 0 }, debug: false }

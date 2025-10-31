@@ -24,6 +24,8 @@ canvas {
 
 #game-container {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    width: 80%;
+    max-width: 800px;
 }
 
 /* --- UI要素のスタイル --- */
