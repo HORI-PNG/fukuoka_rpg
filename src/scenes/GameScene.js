@@ -17,11 +17,31 @@ export class GameScene extends Phaser.Scene {
         const map = this.add.image(400, 300, 'map');
         map.setDisplaySize(800, 600);
 
-        const debugGraphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000ff, alpha: 0.5 } });
+        // 訪問済スポットの色を定義
+        const visitedColor = 0xffaaaa; // 薄い赤色
+        const defaultColor = 0x0000ff; // もともとの青色
 
+        // 現在のプレイヤーの訪問履歴を取得
+        const currentPlayer = window.gameApi.getCurrentPlayer();
+        const visitedSpots = currentPlayer ? (currentPlayer.visited_spots || []) : [];
+        // デバッグ用の円を描画する Graphics オブジェクト
+        // ★ 既存の debugGraphics は削除またはコメントアウト
+        // const debugGraphics = this.add.graphics({ lineStyle: { width: 2, color: 0x0000ff, alpha: 0.5 } });
+
+        // 各スポットごとにGraphicsオブジェクトを作成
         this.spotObjects = this.physics.add.staticGroup();
         spots.forEach(spot => {
             const radius = spot.width / 2;
+
+
+            // スポットごとに個別のGraphicsオブジェクトを作成
+            const spotGraphic = this.add.graphics();
+            const isVisited = visitedSpots.includes(spot.name);
+            const spotColor = isVisited ? visitedColor : defaultColor;
+            spotGraphic.lineStyle(2, spotColor, 0.7); // 訪問済みかで色を変更
+            spotGraphic.strokeCircle(spot.x, spot.y, radius);
+
+            // 物理判定用の見えないオブジェクトを作成
             const spotObject = this.spotObjects.create(spot.x, spot.y, null)
                 .setCircle(radius)
                 .setVisible(false);
@@ -29,7 +49,9 @@ export class GameScene extends Phaser.Scene {
             spotObject.reward = spot.reward;
             spotObject.url = spot.url;
             spotObject.type = spot.type;
-            debugGraphics.strokeCircle(spot.x, spot.y, radius);
+
+            // 作成した Graphics を spotObject に関連付けておく (後で色を変える場合など)
+            spotObject.graphic = spotGraphic;
         });
 
         this.anims.create({
@@ -114,29 +136,67 @@ export class GameScene extends Phaser.Scene {
 
     // onSpotOverlap を Supabase の訪問履歴（visited_spots）を参照するように変更
     // onSpotOverlap を多重実行防止版に修正
-    onSpotOverlap(player, spot) {
+    async onSpotOverlap(player, spot) {
         // 既にシーン遷移中、またはプレイヤーAPIがなければ何もしない
         if (this.isEnteringSpot || !window.gameApi) return;
+
         const currentPlayer = window.gameApi.getCurrentPlayer();
         if (!currentPlayer) return; // プレイヤー情報がなければ何もしない
+
         // プレイヤーの訪問履歴（Supabaseからロードしたもの）をチェック
         const visitedSpots = currentPlayer.visited_spots || [];
         const hasVisited = visitedSpots.includes(spot.name);
+
         if (!hasVisited) {
             // フラグを立てて、多重実行を防ぐ
             this.isEnteringSpot = true;
-            // 訪問履歴をDBに保存するAPI（game.js）を呼び出す
-            if (window.gameApi && typeof window.gameApi.addVisitedSpot === 'function') {
-                window.gameApi.addVisitedSpot(spot.name);
+
+            // スポットの色を即座に変更
+            if (spot.spotGraphic) {
+                const visitedColor = 0xffaaaa;
+                spot.spotGraphic.clear();
+                spot.spotGraphic.lineStyle(2, visitedColor, 0.7); // 新しい色で描画
+                spot.spotGraphic.strokeCircle(spot.x, spot.y, spot.width / 2);
             }
-            // シーン遷移
+
+            // 訪問履歴をDBに保存するAPI（game.js）を呼び出す
+            // async関数だが、ここでは完了を待たずに進める (awaitしない)
+            if (window.gameApi && typeof window.gameApi.addVisitedSpot === 'function') {
+                try {
+                    await window.gameApi.addVisitedSpot(spot.name);
+                } catch (error) {
+                    console.error('訪問履歴の保存に失敗しました:', error);
+                    this.isEnteringSpot = false;
+                }
+            }
+
+            // 保存が終わってからシーン遷移
             if (spot.url) {
-            // ミニゲームへ遷移 (ページがリロードされるのでフラグは自動解除)
+                // ミニゲームへ遷移 (ページがリロードされるのでフラグは自動解除)
                 window.location.href = spot.url;
+                setTimeout(() => {
+                    this.isEnteringSpot = false;
+                }, 3000);
+                // 遷移後もisEnteringSpotがtrueのままにならないよう、念のためfalseに戻す
+                // (遷移に失敗した場合への対策)
+                // this.isEnteringSpot = false; // ← 通常は不要だが、保険として入れても良い
             } else {
                 // クイズシーンへ遷移 (GameSceneは pause されるだけ)
                 this.scene.pause();
                 // クイズシーンが終了(shutdown)したら、フラグを解除するリスナーを設定
+                // QuizSceneが存在することを確認してからリスナーを設定
+                const quizScene = this.scene.get('QuizScene');
+                if (quizScene) {
+                    quizScene.events.once('shutdown', () => {
+                        this.isEnteringSpot = false;
+                        // GameSceneを再開する（resume）必要があればここに追加
+                        // this.scene.resume(); // QuizScene.js側でresumeしているなら不要
+                    });
+                } else {
+                    // QuizSceneが見つからない場合のエラー処理（念のため）
+                    console.error('QuizSceneが見つかりません。');
+                    this.isEnteringSpot = false;
+                }
                 this.scene.launch('QuizScene', { spotName: spot.name, reward: spot.reward });
             }
         }

@@ -134,7 +134,7 @@ window.addEventListener('load', () => {
 
     // 💼ボタンとアイテムボックスの要素を取得
     const toggleItemsButton = document.getElementById('toggle-items-button');
-    const itemsBox = document.getElementById('items-box');
+    const itemsBox = document.getElementById('item-box');
 
     if (resetButton) {
         resetButton.addEventListener('click', () => {
