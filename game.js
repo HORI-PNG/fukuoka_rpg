@@ -103,9 +103,11 @@ async function savePlayerData(player) {
 // アイテムボックスの中身を更新する関数
 function displayItems() {
     const itemsDiv = document.getElementById('items');
-    if (!itemsDiv) return;
+    const itemScoreSpan = document.getElementById('item-score');
+    if (!itemsDiv || itemScoreSpan) return;
     itemsDiv.innerHTML = ''; // 中身をリセット
     if (currentPlayer && Array.isArray(currentPlayer.items) && currentPlayer.items.length > 0) {
+        itemsScoreSpan.textContent = currentPlayer.items.length;
         currentPlayer.items.forEach(itemName => {
             const itemElement = document.createElement('div');
             itemElement.className = 'item'; // (style.cssで定義済み)
@@ -113,16 +115,14 @@ function displayItems() {
             itemsDiv.appendChild(itemElement);
         });
     } else {
+        itemScoreqSpan.textContent = 0;
         itemsDiv.textContent = 'まだアイテムを持っていません。';
     }
 }
 
 function setupGame(playerData) {
-    document.getElementById('current-player').textContent = playerData.name;
-    document.getElementById('current-score').textContent = playerData.score;
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('game-container').style.display = 'block';
-    document.getElementById('game-info').style.display = 'block';
 
     // ゲーム開始時にアイテムボックスの中身を初期化
     displayItems();
@@ -221,8 +221,7 @@ window.gameApi = {
     updateScore: async (points) => {
         if (!currentPlayer) return;
         currentPlayer.score += points;
-        document.getElementById('current-score').textContent = currentPlayer.score;
-        await savePlayerData(currentPlayer);
+        await savePlayerData(currentPlayer); // DBへの保存（ランキング用）は残す
     },
     addItem: async (itemName) => {
         if (!currentPlayer) return;
@@ -235,7 +234,7 @@ window.gameApi = {
         displayItems();
     },
     // 訪問済スポットを保存するためのAPI
-    addVisitedSpot: async (spotId) => {
+    addVisitedSpot: async (spotName) => {
         if (!currentPlayer) return;
         if (!Array.isArray(currentPlayer.visited_spots)) {
             currentPlayer.visited_spots = [];
