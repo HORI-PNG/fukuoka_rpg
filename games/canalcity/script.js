@@ -80,6 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // マップに戻るボタンの処理
     backButton.addEventListener('click', () => {
-        window.location.href = '../../index.html?reward=100億ドルの夜景&success=true';
+        window.location.href = '../../index.html?reward=もつ鍋&success=true';
     });
 });

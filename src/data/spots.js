@@ -122,7 +122,7 @@ export const spots = [
         y: 300,
         width: 50,
         height: 50,
-        url: 'game/canalcity/index.html',
+        url: './game/canalcity/index.html',
         reward: 'もつ鍋'
     },
     {
