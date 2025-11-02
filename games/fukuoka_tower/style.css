@@ -1,0 +1,81 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: sans-serif;
+    background-color: #0c1445; /* 夜空の色 */
+    color: white;
+}
+
+/* パズル画像のパスを指定 */
+:root {
+    --puzzle-image: url('./福岡タワー.png');
+    --puzzle-width: 450px; /* 150px * 3 */
+    --puzzle-height: 270px; /* 90px * 3 */
+    --piece-width: 150px; /* (450 / 3) */
+    --piece-height: 90px; /* (270 / 3) */
+}
+
+#puzzle-board {
+    width: var(--puzzle-width);
+    height: var(--puzzle-height);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 2px solid #fff;
+}
+
+.puzzle-slot {
+    width: var(--piece-width);
+    height: var(--piece-height);
+    background-color: #333;
+    border: 1px dashed #777;
+    box-sizing: border-box; /* 枠線を含めて計算 */
+}
+
+#piece-container {
+    margin-top: 20px;
+    width: calc(var(--puzzle-width) + 20px);
+    height: calc(var(--piece-height) * 3 + 20px); /* 3段積める高さ */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px;
+    background-color: #222;
+    border-radius: 5px;
+}
+
+.puzzle-piece {
+    width: var(--piece-width);
+    height: var(--piece-height);
+    background-image: var(--puzzle-image);
+    background-size: var(--puzzle-width) var(--puzzle-height);
+    border: 2px solid #ccc;
+    cursor: grab;
+    box-sizing: border-box;
+}
+
+/* ピースごとの背景位置 (3x3) */
+.piece-0 { background-position: 0 0; }
+.piece-1 { background-position: -150px 0; }
+.piece-2 { background-position: -300px 0; }
+.piece-3 { background-position: 0 -90px; }
+.piece-4 { background-position: -150px -90px; }
+.piece-5 { background-position: -300px -90px; }
+.piece-6 { background-position: 0 -180px; }
+.piece-7 { background-position: -150px -180px; }
+.piece-8 { background-position: -300px -180px; }
+
+/* 結果表示 */
+.result-area {
+    margin-top: 20px;
+    padding: 20px;
+    text-align: center;
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+}
+#back-to-map {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+}

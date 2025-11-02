@@ -97,12 +97,12 @@ export const spots = [
     },
     {
         name: '福岡タワー',
-        type: 'quiz',
+        type: 'minigame',
         x: 400,
         y: 400,
         width: 50,
         height: 100,
-        url: 'https://www.fukuokatower.co.jp/',
+        url: './games/fukuoka_tower/index.html',
         reward: '明太子'
     },
     {
@@ -117,12 +117,12 @@ export const spots = [
     },
     {
         name: 'キャナルシティ博多',
-        type: 'quiz',
+        type: 'minigame',
         x: 500,
         y: 300,
         width: 50,
         height: 50,
-        url: 'https://canalcity.co.jp/',
+        url: 'game/canalcity/index.html',
         reward: 'もつ鍋'
     },
     {
