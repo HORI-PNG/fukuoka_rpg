@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>二見ヶ浦 - 絆タイミング</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>絆タイミング</h1>
+    <p>波（青いバー）が夫婦岩（緑のエリア）に重なる瞬間に [スペースキー] を押そう！</p>
+
+    <div id="game-container">
+        <div id="timing-marker"></div>
+        <div id="timing-cursor"></div>
+    </div>
+
+    <div id="status-board">
+        成功: <span id="success-count">0</span> / 失敗: <span id="miss-count">0</span>
+    </div>
+
+    <div class="result-area" style="display: none;">
+        <h2>クリア！</h2>
+        <p>「縁結びのお守り」を手に入れた！</p>
+        <button id="back-to-map">マップに戻る</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

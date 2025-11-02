@@ -1,0 +1,35 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: sans-serif;
+    background-color: #000033; /* 深海の色 */
+    color: #f0f0f0;
+}
+
+canvas {
+    border: 2px solid #3399ff; /* 水槽の枠 */
+    background-color: #003366; /* 水の色 */
+    cursor: crosshair; /* 照準カーソル */
+}
+
+#status-board {
+    font-size: 1.2em;
+    margin: 10px 0;
+}
+
+/* 結果表示 */
+.result-area {
+    margin-top: 20px;
+    padding: 20px;
+    text-align: center;
+    background-color: white;
+    color: #333;
+    border: 2px solid #3399ff;
+    border-radius: 10px;
+}
+#back-to-map {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+}

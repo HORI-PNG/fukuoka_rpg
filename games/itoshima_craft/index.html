@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>糸島 - カフェクラフト（素材集め）</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>カフェクラフト（素材集め）</h1>
+    <p>制限時間内に素材（茶色や白の丸）をクリックして集めよう！</p>
+    <div id="status-board">
+        集めた素材: <span id="score">0</span> / 
+        残り時間: <span id="timer">20</span>
+    </div>
+
+    <canvas id="game-canvas" width="500" height="400"></canvas>
+
+    <div class="result-area" style="display: none;">
+        <h2>クリア！</h2>
+        <p>「手作りブレスレット」を手に入れた！</p>
+        <button id="back-to-map">マップに戻る</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

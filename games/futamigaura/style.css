@@ -1,0 +1,68 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: sans-serif;
+    background-color: #ffcc80; /* 夕焼けの空 */
+    color: #4e342e; /* 濃い茶色 */
+}
+
+#game-container {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    height: 100px; /* バーの高さを確保 */
+    padding: 10px;
+    background-color: #f57c00; /* 夕焼けの海 */
+    border: 2px solid #4e342e;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#timing-marker {
+    position: absolute;
+    width: 30px; /* 夫婦岩（成功エリア）の幅 */
+    height: 100%;
+    background-color: #4caf50; /* 成功エリア（緑） */
+    left: 80%; /* 右側に固定 */
+    top: 0;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+}
+
+#timing-cursor {
+    position: absolute;
+    width: 80px; /* 波（カーソル）の幅 */
+    height: 100%;
+    background-color: #03a9f4; /* 波の色 */
+    opacity: 0.8;
+    top: 0;
+    
+    /* 左から右へ流れるアニメーション (2秒) */
+    animation: move-wave 2s linear infinite;
+}
+
+/* アニメーションの定義 */
+@keyframes move-wave {
+    0% { left: -80px; } /* 画面左外から */
+    100% { left: 100%; } /* 画面右外へ */
+}
+
+#status-board {
+    font-size: 1.2em;
+    margin: 15px 0;
+}
+
+/* 結果表示 */
+.result-area {
+    margin-top: 20px;
+    padding: 20px;
+    text-align: center;
+    background-color: white;
+    border: 2px solid #f57c00;
+    border-radius: 10px;
+}
+#back-to-map {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+}

@@ -1,0 +1,52 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: sans-serif;
+    background-color: #fdf5e6; /* 和風な背景色 */
+    text-align: center;
+}
+
+h1, h2 {
+    color: #8b0000; /* 暗い赤色 */
+}
+
+#omikuji-screen, #quiz-screen, .result-area {
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+    margin-top: 20px;
+    background-color: white;
+    border: 2px solid #a0522d; /* 茶色 */
+    border-radius: 10px;
+}
+
+#draw-omikuji-button {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    cursor: pointer;
+    background-color: #daa520; /*金色っぽい色*/
+    border: none;
+    border-radius: 5px;
+}
+
+#fortune-text {
+    font-size: 1.5em;
+    color: #d9534f;
+}
+
+#quiz-choices button {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+    padding: 10px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+/* 結果表示 */
+#back-to-map {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+}

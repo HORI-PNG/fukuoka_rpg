@@ -1,0 +1,27 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: sans-serif;
+    background-color: #f0f8ff; /* 明るい空色 */
+}
+
+canvas {
+    border: 2px solid #333;
+    background-color: #4682b4; /* 池の水の色（スチールブルー） */
+}
+
+/* 結果表示 */
+.result-area {
+    margin-top: 20px;
+    padding: 20px;
+    text-align: center;
+    background-color: white;
+    border: 2px solid #4682b4;
+    border-radius: 10px;
+}
+#back-to-map {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+}

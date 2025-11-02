@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>マリンワールド - 深海フォトハンター</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>深海フォトハンター</h1>
+    <p>泳ぎ回る魚をクリックして撮影しよう！ (目標: 15匹)</p>
+    <div id="status-board">
+        撮影した数: <span id="score">0</span> / 
+        残り時間: <span id="timer">30</span>
+    </div>
+
+    <canvas id="game-canvas" width="500" height="400"></canvas>
+
+    <div class="result-area" style="display: none;">
+        <h2>撮影成功！</h2>
+        <p>「海の仲間たちのキーホルダー」を手に入れた！</p>
+        <button id="back-to-map">マップに戻る</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

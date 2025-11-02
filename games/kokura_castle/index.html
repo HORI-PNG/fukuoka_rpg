@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>小倉城 - 城防衛ゲーム</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>小倉城 防衛ゲーム</h1>
+    <p>敵（赤色）から城（青色）を守り抜け！</p>
+    <p>左右キーで移動、スペースキーで矢を発射！</p>
+    <div id="score-board">スコア: <span id="score">0</span></div>
+
+    <canvas id="game-canvas" width="400" height="500"></canvas>
+
+    <div class="result-area" style="display: none;">
+        <h2>防衛成功！</h2>
+        <p>「小倉城の瓦」を手に入れた！</p>
+        <button id="back-to-map">マップに戻る</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

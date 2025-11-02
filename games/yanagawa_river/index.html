@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>柳川の川下り - どんこ舟リズム漕ぎ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>どんこ舟リズム漕ぎ</h1>
+    <p>緑色のエリアで [スペースキー] を押して、舟を漕ごう！</p>
+
+    <div id="game-container">
+        <div id="timing-bar-container">
+            <div id="timing-marker"></div>
+            <div id="timing-cursor"></div>
+        </div>
+    </div>
+
+    <div id="status-board">
+        成功: <span id="success-count">0</span> / 失敗: <span id="miss-count">0</span>
+    </div>
+
+    <div class="result-area" style="display: none;">
+        <h2>クリア！</h2>
+        <p>「うなぎのせいろ蒸し」を手に入れた！</p>
+        <button id="back-to-map">マップに戻る</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

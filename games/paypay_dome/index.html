@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>PayPayドーム - ホームランチャレンジ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>ホームランチャレンジ</h1>
+    <p>タイミングを合わせてボールを打て！</p>
+
+    <div id="game-container">
+        <div id="ball"></div>
+        <div id="bat"></div>
+        <div id="timing-bar-container">
+            <div id="timing-bar"></div>
+            <div id="timing-marker"></div>
+        </div>
+        <button id="swing-button">スイング！</button>
+    </div>
+
+    <div class="result-area" style="display: none;">
+        <h2>ホームラン！</h2>
+        <p>「ホームラン記念ボール」を手に入れた！</p>
+        <button id="back-to-map">マップに戻る</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
