@@ -68,6 +68,7 @@ export class GameScene extends Phaser.Scene {
 
         this.player = this.physics.add.sprite(400, 300, 'player_stand');
         this.player.setDisplaySize(96, 96);
+        this.player.setSize(10, 10);
         this.player.setCollideWorldBounds(true);
         this.player.setDepth(2); // プレイヤーは一番前
 
