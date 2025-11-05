@@ -104,16 +104,16 @@ export const spots = [
     //     url: './games/paypay_dome/index.html', // テスト用のURL
     //     reward: 'ホームラン記念ボール'
     // },
-    // {
-    //     name: 'キャナルシティ博多',
-    //     type: 'minigame',
-    //     x: 500,
-    //     y: 360,
-    //     width: 150,
-    //     height: 50,
-    //     url: './games/canalcity/index.html',
-    //     reward: 'もつ鍋'
-    // },
+    {
+        name: 'キャナルシティ博多',
+        type: 'minigame',
+        x: 500,
+        y: 360,
+        width: 150,
+        height: 50,
+        url: './games/canalcity/index.html',
+        reward: 'もつ鍋'
+    },
     // {
     //     name: '中州屋台',
     //     type: 'minigame', // タイプを'minigame'に変更（'quiz'のままでも動作します）

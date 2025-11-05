@@ -29,19 +29,18 @@ body {
     height: var(--piece-height);
     background-color: #333;
     border: 1px dashed #777;
-    box-sizing: border-box; /* 枠線を含めて計算 */
+    box-sizing: border-box;
+    position: relative; /* ★追加： スナップしたピースの基準 */
 }
 
 #piece-container {
     margin-top: 20px;
     width: calc(var(--puzzle-width) + 20px);
     height: calc(var(--piece-height) * 3 + 20px); /* 3段積める高さ */
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
     padding: 10px;
     background-color: #222;
     border-radius: 5px;
+    position: relative; /* ★変更： ピースの初期位置の基準 */
 }
 
 .puzzle-piece {
@@ -52,6 +51,28 @@ body {
     border: 2px solid #ccc;
     cursor: grab;
     box-sizing: border-box;
+    
+    position: absolute; /* ★変更： 常に絶対配置 */
+    transition: transform 0.1s ease-out, box-shadow 0.2s; /* 動きを滑らかに */
+    z-index: 10; /* 通常は手前 */
+}
+
+/* ★追加： タッチ操作中のピースのスタイル */
+.puzzle-piece.dragging {
+    transform: scale(1.1); /* 少し大きく */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* 影をつける */
+    z-index: 100; /* 最も手前に表示 */
+    cursor: grabbing;
+}
+
+/* ★追加： スロットにはまったピース */
+.puzzle-piece.snapped {
+    border: none;
+    cursor: default;
+    z-index: 1; /* スロットの奥に */
+    position: absolute; /* スロットの(0,0)基準 */
+    left: 0;
+    top: 0;
 }
 
 /* ピースごとの背景位置 (3x3) */
