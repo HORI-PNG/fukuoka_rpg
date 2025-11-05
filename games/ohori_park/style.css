@@ -9,6 +9,8 @@ body {
 canvas {
     border: 2px solid #333;
     background-color: #4682b4; /* 池の水の色（スチールブルー） */
+    /* ★修正：横幅を固定 (高さはHTMLで指定した400pxになる) */
+    width: 500px;
 }
 
 /* 結果表示 */

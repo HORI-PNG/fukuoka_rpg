@@ -2,31 +2,30 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>福岡タワー - パズル</title>
+    <title>福岡タワー - 間違い探しゲーム</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>福岡タワー パズル</h1>
-    <p>下のピースをドラッグ＆ドロップして、福岡タワーを完成させよう！</p>
+    <h1>福岡タワー 間違い探し</h1>
+    <p>2つの画像を見比べて、間違いを2箇所クリック（タップ）しよう！</p>
 
-    <div id="puzzle-board">
-        <div class="puzzle-slot" data-index="0"></div>
-        <div class="puzzle-slot" data-index="1"></div>
-        <div class="puzzle-slot" data-index="2"></div>
-        <div class="puzzle-slot" data-index="3"></div>
-        <div class="puzzle-slot" data-index="4"></div>
-        <div class="puzzle-slot" data-index="5"></div>
-        <div class="puzzle-slot" data-index="6"></div>
-        <div class="puzzle-slot" data-index="7"></div>
-        <div class="puzzle-slot" data-index="8"></div>
+    <div id="game-container">
+        <div class="image-wrapper">
+            <img src="福岡タワー.png" alt="正解の画像">
+            <p>【正解】</p>
+        </div>
+        <div class="image-wrapper" id="mistake-image-wrapper">
+            <img src="福岡タワー_間違い.png" alt="間違いのある画像" id="mistake-image">
+            <p>【間違い】</p>
+        </div>
     </div>
 
-    <div id="piece-container">
-        </div>
-
+    <div id="status-board">
+        見つけた数: <span id="found-count">0</span> / 2
+    </div>
 
     <div class="result-area" style="display: none;">
-        <h2>完成！</h2>
+        <h2>クリア！</h2>
         <p>「明太子」を手に入れた！</p>
         <button id="back-to-map">マップに戻る</button>
     </div>

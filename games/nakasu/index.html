@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>中州屋台 - ラーメンタイムアタック</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>ラーメンタイムアタック</h1>
+    <p>お客さんの注文通りに、素早く具材を入れてラーメンを完成させよう！</p>
+
+    <div id="game-container">
+        <div id="customer-area">
+            <div id="customer-timer-bar"></div>
+            <div id="order-text">注文: </div>
+        </div>
+        
+        <div id="ramen-bowl">
+            <div class="topping" id="topping-noodles"></div>
+            <div class="topping" id="topping-soup"></div>
+            <div class="topping" id="topping-chashu"></div>
+            <div class="topping" id="topping-negi"></div>
+        </div>
+
+        <div id="ingredients">
+            <button class="ingredient-btn" data-item="soup">スープ</button>
+            <button class="ingredient-btn" data-item="noodles">麺</button>
+            <button class="ingredient-btn" data-item="chashu">チャーシュー</button>
+            <button class="ingredient-btn" data-item="negi">ネギ</button>
+        </div>
+    </div>
+
+    <div id="status-board">
+        スコア (作った杯数): <span id="score">0</span>
+    </div>
+
+    <div class="result-area" style="display: none;">
+        <h2>クリア！</h2>
+        <p>「ラーメン」を手に入れた！</p>
+        <button id="back-to-map">マップに戻る</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

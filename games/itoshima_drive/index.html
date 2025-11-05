@@ -2,21 +2,27 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>糸島 - サンセットドライブ</title>
+    <title>糸島 - 交通安全クイズ</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>サンセットドライブ</h1>
-    <p>障害物（赤色）をよけて、海岸線を走り抜けろ！</p>
-    <p>（左右の矢印キーで操作）</p>
+    <h1>サンセットロード 交通安全クイズ</h1>
+    <p>美しい夕日を見るためにも安全運転！クイズに答えよう！ (3問正解でクリア)</p>
 
     <div id="game-container">
-        <div id="player"></div>
+        <div id="quiz-question">
+            </div>
+        <div id="quiz-choices">
+            </div>
+    </div>
+
+    <div id="status-board">
+        正解数: <span id="score">0</span> / 3
     </div>
 
     <div class="result-area" style="display: none;">
-        <h2>完走！</h2>
-        <p>「おしゃれな貝殻」を手に入れた！</p>
+        <h2>クリア！</h2>
+        <p>「貝殻」を手に入れた！</p>
         <button id="back-to-map">マップに戻る</button>
     </div>
 

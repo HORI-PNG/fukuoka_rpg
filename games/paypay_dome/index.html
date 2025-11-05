@@ -2,25 +2,22 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>PayPayドーム - ホームランチャレンジ</title>
+    <title>PayPayドーム - ボールキャッチゲーム</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>ホームランチャレンジ</h1>
-    <p>タイミングを合わせてボールを打て！</p>
+    <h1>ボールキャッチゲーム</h1>
+    <p>上から落ちてくるボール（白）をキャッチしよう！</p>
+    <p>左右キーでキャッチャー（青）を操作 (10個キャッチでクリア)</p>
+    
+    <canvas id="game-canvas" width="400" height="500"></canvas>
 
-    <div id="game-container">
-        <div id="ball"></div>
-        <div id="bat"></div>
-        <div id="timing-bar-container">
-            <div id="timing-bar"></div>
-            <div id="timing-marker"></div>
-        </div>
-        <button id="swing-button">スイング！</button>
+    <div id="status-board">
+        スコア: <span id="score">0</span>
     </div>
 
     <div class="result-area" style="display: none;">
-        <h2>ホームラン！</h2>
+        <h2>クリア！</h2>
         <p>「ホームラン記念ボール」を手に入れた！</p>
         <button id="back-to-map">マップに戻る</button>
     </div>

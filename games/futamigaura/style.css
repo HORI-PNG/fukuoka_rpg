@@ -3,53 +3,56 @@ body {
     flex-direction: column;
     align-items: center;
     font-family: sans-serif;
-    background-color: #ffcc80; /* 夕焼けの空 */
+    background: linear-gradient(to bottom, #ffcc80, #f57c00); /* 夕焼けの空と海 */
     color: #4e342e; /* 濃い茶色 */
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+h1 {
+    color: white;
+    text-shadow: 1px 1px 2px #4e342e;
+}
+
+p {
+    color: white;
 }
 
 #game-container {
-    position: relative;
     width: 90%;
-    max-width: 500px;
-    height: 100px; /* バーの高さを確保 */
-    padding: 10px;
-    background-color: #f57c00; /* 夕焼けの海 */
-    border: 2px solid #4e342e;
+    max-width: 600px;
+    background-color: rgba(255, 255, 255, 0.9); /* 白い門（鳥居）をイメージ */
+    border: 5px solid white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+#story-text {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    min-height: 100px;
+}
+
+#choices-container button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-top: 10px;
+    font-size: 1.1em;
+    text-align: left;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
     border-radius: 5px;
-    overflow: hidden;
+    transition: background-color 0.2s;
 }
 
-#timing-marker {
-    position: absolute;
-    width: 30px; /* 夫婦岩（成功エリア）の幅 */
-    height: 100%;
-    background-color: #4caf50; /* 成功エリア（緑） */
-    left: 80%; /* 右側に固定 */
-    top: 0;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
-}
-
-#timing-cursor {
-    position: absolute;
-    width: 80px; /* 波（カーソル）の幅 */
-    height: 100%;
-    background-color: #03a9f4; /* 波の色 */
-    opacity: 0.8;
-    top: 0;
-    
-    /* 左から右へ流れるアニメーション (2秒) */
-    animation: move-wave 2s linear infinite;
-}
-
-/* アニメーションの定義 */
-@keyframes move-wave {
-    0% { left: -80px; } /* 画面左外から */
-    100% { left: 100%; } /* 画面右外へ */
-}
-
-#status-board {
-    font-size: 1.2em;
-    margin: 15px 0;
+#choices-container button:hover {
+    background-color: #e0e0e0;
 }
 
 /* 結果表示 */

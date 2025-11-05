@@ -1,76 +1,59 @@
 body {
     display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
+    align-items: center;
     font-family: sans-serif;
     background-color: #f3e5f5; /* 薄い紫色 */
-}
-
-h1 {
     color: #4a148c; /* 濃い紫色 */
+    min-height: 100vh;
 }
 
-.game-board {
-    width: 420px;
-    height: 320px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    perspective: 1000px;
-}
-
-.card {
-    width: 90px;
-    height: 90px;
-    background-color: #7b1fa2; /* カードの裏面（紫色） */
-    border: 2px solid #4a148c;
+#game-container {
+    width: 90%;
+    max-width: 500px;
+    background-color: white;
+    border: 3px solid #7b1fa2;
     border-radius: 10px;
-    cursor: pointer;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.6s;
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 20px;
+    margin-top: 15px;
+}
+
+#quiz-question {
     font-size: 1.2em;
     font-weight: bold;
-    
-    /* ★修正：初期状態は文字を透明にする */
-    color: transparent; 
+    margin-bottom: 20px;
+    min-height: 80px;
 }
 
-.card.flip {
-    transform: rotateY(180deg);
-    /* ★修正：めくれたら文字色を白にする（基本）*/
-    color: white; 
-    text-shadow: 1px 1px 2px black;
+#quiz-choices button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-top: 10px;
+    font-size: 1.1em;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+#quiz-choices button:hover {
+    background-color: #e0e0e0;
 }
 
-/* 色ごとのスタイル（背景色） */
-.card-purple { background-color: #9c27b0; }
-.card-pink { background-color: #ec407a; }
-.card-white { background-color: #f5f5f5; }
-.card-blue { background-color: #2196f3; }
-.card-yellow { background-color: #fbc02d; }
-.card-deep-purple { background-color: #512da8; }
-
-/* ★修正：白いカードだけ、めくれた時の文字色を黒にする */
-.card-white.flip {
-    color: #333;
-    text-shadow: none;
+#status-board {
+    font-size: 1.2em;
+    margin: 15px 0;
 }
 
+/* 結果表示 */
 .result-area {
-    margin-top: 20px;
+    margin-top: 10px;
     padding: 20px;
     text-align: center;
     background-color: white;
     border: 2px solid #7b1fa2;
     border-radius: 10px;
 }
-
 #back-to-map {
     padding: 10px 20px;
     font-size: 1em;

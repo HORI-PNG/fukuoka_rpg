@@ -100,9 +100,9 @@ export const spots = [
         name: '福岡タワー',
         type: 'minigame',
         x: 400,
-        y: 200,
+        y: 180,
         width: 100,
-        height: 250,
+        height: 150,
         url: './games/fukuoka_tower/index.html',
         reward: '明太子'
     },
@@ -111,7 +111,7 @@ export const spots = [
         type: 'minigame',
         x: 520,
         y: 280,
-        width: 150,
+        width: 100,
         height: 100,
         url: './games/paypay_dome/index.html', // テスト用のURL
         reward: 'ホームラン記念ボール'
@@ -133,7 +133,7 @@ export const spots = [
         y: 420,
         width: 150,
         height: 50,
-        url: './games/yatai_shooting/index.html', 
+        url: './games/nakasu/index.html', 
         reward: 'ラーメン' // 
     },
     {

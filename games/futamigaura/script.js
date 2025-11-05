@@ -1,84 +1,97 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const cursor = document.getElementById('timing-cursor');
-    const marker = document.getElementById('timing-marker');
-    const barContainer = document.getElementById('game-container');
-    const successCountElem = document.getElementById('success-count');
-    const missCountElem = document.getElementById('miss-count');
+    const storyText = document.getElementById('story-text');
+    const choicesContainer = document.getElementById('choices-container');
     const resultArea = document.querySelector('.result-area');
     const backButton = document.getElementById('back-to-map');
 
-    let successCount = 0;
-    let missCount = 0;
-    const SUCCESS_GOAL = 5; // 5回成功でクリア
-    const MISS_LIMIT = 3;   // 3回失敗でゲームオーバー
+    // シナリオデータ
+    const storyData = {
+        0: {
+            text: '夕日が沈みかけている。白い鳥居が美しい。隣には意中の人がいる...！\nさあ、なんと声をかける？',
+            choices: [
+                { text: '「今日の夕日、すごく綺麗だね。」', next: 1 },
+                { text: '「...（黙って夕日を見つめる）」', next: 2 },
+                { text: '「ねえ、寒いから早く帰らない？」', next: 3 }
+            ]
+        },
+        1: {
+            text: '相手：「本当だね...。こんな素敵な景色、〇〇さんと見れてよかった。」\n（いい雰囲気だ！あと一押し！）',
+            choices: [
+                // ★修正： next: 'win' ではなく、result: 'win' を使う
+                { text: '「俺（私）もだよ。...ずっと一緒にいたいな。」', result: 'win' },
+                { text: '「あ、あれカモメかな？（照れ隠し）」', next: 4 }
+            ]
+        },
+        2: {
+            text: '相手：「...（何か言いたそうだが、黙っている）」\n（気まずい雰囲気になってしまった...）',
+            choices: [
+                { text: '「ごめん、何か考え事してた！」', next: 1 },
+                { text: '「...（帰りたくないな）」', next: 3 }
+            ]
+        },
+        3: {
+            text: '相手：「えっ...。そ、そうだね。」\n（完全にムードが壊れてしまった...最初からやり直そう！）',
+            choices: [],
+            result: 'lose'
+        },
+        4: {
+            text: '相手：「え？どこどこ？...あ、本当だ。」\n（...せっかくの雰囲気が台無しになってしまった。やり直し！）',
+            choices: [],
+            result: 'lose'
+        }
+    };
 
-    let gameInProgress = true;
-    let canPress = true; // 1回の波で1回だけ押せるようにするフラグ
-
-    // スペースキーが押されたときの処理
-    document.addEventListener('keydown', (e) => {
-        // スペースキー以外、ゲーム終了後、またはフラグがfalseなら無視
-        if (e.key !== ' ' || !gameInProgress || !canPress) return;
-
-        // 押せなくする
-        canPress = false;
-
-        // 1. 波（カーソル）の現在位置を取得
-        const cursorRect = cursor.getBoundingClientRect();
-        const containerRect = barContainer.getBoundingClientRect();
-        const cursorLeft = cursorRect.left - containerRect.left;
-        const cursorRight = cursorRect.right - containerRect.left;
-
-        // 2. 夫婦岩（マーカー）の位置を取得
-        const markerLeft = marker.offsetLeft;
-        const markerRight = marker.offsetLeft + marker.offsetWidth;
-
-        // 3. 当たり判定
-        // (波の先端がマーカーに入った瞬間)
-        if (cursorRight > markerLeft && cursorLeft < markerRight) {
-            // 成功！
-            successCount++;
-            successCountElem.textContent = successCount;
-            // 成功エフェクト
-            marker.style.backgroundColor = '#81c784';
-            setTimeout(() => { marker.style.backgroundColor = '#4caf50'; }, 200);
-
-        } else {
-            // 失敗
-            missCount++;
-            missCountElem.textContent = missCount;
-            // 失敗エフェクト
-            marker.style.backgroundColor = '#e57373';
-            setTimeout(() => { marker.style.backgroundColor = '#4caf50'; }, 200);
+    // ★修正：関数全体を修正
+    function showScene(sceneId) {
+        
+        // ★追加： 'win' が渡された場合は、ここでクリア処理
+        if (sceneId === 'win') {
+            storyText.innerHTML = "相手：「...！ はいっ...！（告白成功だ！）」";
+            choicesContainer.innerHTML = ''; // 選択肢を消す
+            setTimeout(() => {
+                document.getElementById('game-container').style.display = 'none';
+                resultArea.style.display = 'block';
+            }, 2000);
+            return; // 関数を終了
         }
 
-        // 4. 勝敗判定
-        checkGameStatus();
-    });
+        const scene = storyData[sceneId];
+        
+        storyText.innerHTML = scene.text.replace(/\n/g, '<br>');
+        choicesContainer.innerHTML = '';
 
-    // 波が画面外に出たら、再度押せるようにする
-    cursor.addEventListener('animationiteration', () => {
-        canPress = true; // アニメーションが1周したらリセット
-    });
-
-    function checkGameStatus() {
-        if (successCount >= SUCCESS_GOAL) {
-            // クリア
-            gameInProgress = false;
-            cursor.style.animationPlayState = 'paused'; // アニメーション停止
-            resultArea.style.display = 'block';
-
-        } else if (missCount >= MISS_LIMIT) {
-            // ゲームオーバー
-            gameInProgress = false;
-            cursor.style.animationPlayState = 'paused'; // アニメーション停止
-            alert('ああっ、注連縄が切れた！やり直し！');
-            window.location.reload();
+        // --- 結果の判定 (lose) ---
+        if (scene.result === 'lose') {
+            setTimeout(() => {
+                alert('告白失敗...。もう一度チャンスを！');
+                window.location.reload();
+            }, 1500);
+            return;
         }
+
+        // --- 選択肢の表示 ---
+        scene.choices.forEach(choice => {
+            const button = document.createElement('button');
+            button.textContent = choice.text;
+            button.addEventListener('click', () => {
+                
+                // ★修正： 押された選択肢に result: 'win' があるかチェック
+                if (choice.result === 'win') {
+                    showScene('win'); // 'win' を渡してクリア処理を呼び出す
+                } else {
+                    // それ以外なら next に進む
+                    showScene(choice.next);
+                }
+            });
+            choicesContainer.appendChild(button);
+        });
     }
 
     // マップに戻るボタンの処理
     backButton.addEventListener('click', () => {
         window.location.href = '../../index.html?reward=縁結びのお守り&success=true';
     });
+
+    // ゲーム開始
+    showScene(0);
 });

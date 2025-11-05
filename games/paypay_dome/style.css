@@ -6,57 +6,14 @@ body {
     background-color: #e0f8e0; /* 球場っぽい緑色 */
 }
 
-#game-container {
-    width: 300px;
-    height: 400px;
+canvas {
     border: 2px solid #333;
-    background-color: #fff;
-    position: relative;
-    overflow: hidden; /* ボールがはみ出ないように */
+    background-color: #f0f8ff; /* 空の色 */
 }
 
-/* タイミングバー関連 */
-#timing-bar-container {
-    position: absolute;
-    bottom: 50px;
-    left: 10%;
-    width: 80%;
-    height: 30px;
-    background-color: #ccc;
-    border: 2px solid #555;
-}
-
-#timing-marker {
-    position: absolute;
-    width: 10px; /* マーカーの幅 */
-    height: 100%;
-    background-color: #f00; /* 赤色 */
-    left: 45%; /* 真ん中より少し */
-}
-
-#timing-bar {
-    position: absolute;
-    width: 5px; /* 動くバーの幅 */
-    height: 100%;
-    background-color: #00f; /* 青色 */
-    animation: slide 2s linear infinite; /* 2秒で往復 */
-}
-
-/* アニメーションの定義 */
-@keyframes slide {
-    0% { left: 0; }
-    50% { left: calc(100% - 5px); } /* 右端へ */
-    100% { left: 0; } /* 左端へ戻る */
-}
-
-#swing-button {
-    position: absolute;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 20px;
+#status-board {
     font-size: 1.2em;
-    cursor: pointer;
+    margin: 15px 0;
 }
 
 /* 結果表示 */

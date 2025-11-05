@@ -7,67 +7,65 @@ body {
     color: white;
 }
 
-/* パズル画像のパスを指定 */
-:root {
-    --puzzle-image: url('./福岡タワー.png');
-    --puzzle-width: 450px; /* 150px * 3 */
-    --puzzle-height: 270px; /* 90px * 3 */
-    --piece-width: 150px; /* (450 / 3) */
-    --piece-height: 90px; /* (270 / 3) */
-}
-
-#puzzle-board {
-    width: var(--puzzle-width);
-    height: var(--puzzle-height);
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    border: 2px solid #fff;
-}
-
-.puzzle-slot {
-    width: var(--piece-width);
-    height: var(--piece-height);
-    background-color: #333;
-    border: 1px dashed #777;
-    box-sizing: border-box; /* 枠線を含めて計算 */
-}
-
-#piece-container {
-    margin-top: 20px;
-    width: calc(var(--puzzle-width) + 20px);
-    height: calc(var(--piece-height) * 3 + 20px); /* 3段積める高さ */
+#game-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    padding: 10px;
-    background-color: #222;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 10px; /* 画像間の隙間 */
+    flex-wrap: wrap; /* スマホ用に折り返し */
+}
+
+.image-wrapper {
+    position: relative; /* 「間違いミッケ！」の文字を重ねるため */
+    border: 3px solid #fff;
     border-radius: 5px;
+    background-color: #333;
+    padding: 5px;
+}
+.image-wrapper p {
+    text-align: center;
+    margin: 5px 0 0 0;
+    font-weight: bold;
 }
 
-.puzzle-piece {
-    width: var(--piece-width);
-    height: var(--piece-height);
-    background-image: var(--puzzle-image);
-    background-size: var(--puzzle-width) var(--puzzle-height);
-    border: 2px solid #ccc;
-    cursor: grab;
-    box-sizing: border-box;
+#game-container img {
+    width: 400px; /* 画像サイズを固定 */
+    height: 225px; /* 16:9比率 */
+    display: block;
 }
 
-/* ピースごとの背景位置 (3x3) */
-.piece-0 { background-position: 0 0; }
-.piece-1 { background-position: -150px 0; }
-.piece-2 { background-position: -300px 0; }
-.piece-3 { background-position: 0 -90px; }
-.piece-4 { background-position: -150px -90px; }
-.piece-5 { background-position: -300px -90px; }
-.piece-6 { background-position: 0 -180px; }
-.piece-7 { background-position: -150px -180px; }
-.piece-8 { background-position: -300px -180px; }
+#mistake-image-wrapper {
+    cursor: pointer; /* クリックできることを示す */
+}
+
+/* 「間違いミッケ！」のテキストスタイル */
+.feedback-text {
+    position: absolute;
+    font-size: 20px;
+    font-weight: bold;
+    color: #ff0000;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 2px solid #ff0000;
+    pointer-events: none; /* テキスト自体はクリックできないようにする */
+    transform: translate(-50%, -50%); /* 中央揃え */
+    animation: fadeOut 1.5s forwards;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -100%) scale(1.2); }
+}
+
+#status-board {
+    font-size: 1.2em;
+    margin: 15px 0;
+}
 
 /* 結果表示 */
 .result-area {
-    margin-top: 20px;
+    margin-top: 10px;
     padding: 20px;
     text-align: center;
     background-color: white;
@@ -78,4 +76,13 @@ body {
     padding: 10px 20px;
     font-size: 1em;
     cursor: pointer;
+}
+
+.debug-circle {
+    position: absolute; /* 画像の左上を基準に配置 */
+    background-color: rgba(255, 0, 0, 0.5); /* 半透明の赤 */
+    border-radius: 50%; /* 真円にする */
+    pointer-events: none; /* この円自体はクリックできないようにする */
+    transform: translate(-50%, -50%); /* X,Y座標が円の中心になるように調整 */
+    z-index: 100; /* 一番手前に表示 */
 }

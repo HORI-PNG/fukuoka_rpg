@@ -1,131 +1,113 @@
-const gameContainer = document.getElementById('game-container');
-const player = document.getElementById('player');
-const resultArea = document.querySelector('.result-area');
-const backButton = document.getElementById('back-to-map');
+document.addEventListener('DOMContentLoaded', () => {
+    const questionElement = document.getElementById('quiz-question');
+    const choicesContainer = document.getElementById('quiz-choices');
+    const scoreElement = document.getElementById('score');
+    const resultArea = document.querySelector('.result-area');
+    const backButton = document.getElementById('back-to-map');
 
-const GAME_WIDTH = gameContainer.offsetWidth;
-const GAME_HEIGHT = gameContainer.offsetHeight;
-const PLAYER_WIDTH = player.offsetWidth;
-const PLAYER_SPEED = 10;
-const OBSTACLE_SPEED = 5;
-const OBSTACLE_INTERVAL = 1000; // 1秒ごとに障害物を生成
+    const CLEAR_SCORE = 3; // 3問正解でクリア
 
-let playerX = player.offsetLeft;
-let keys = {
-    ArrowLeft: false,
-    ArrowRight: false
-};
+    // クイズデータ (道路交通法)
+    const quizData = [
+        {
+            question: '2023年4月から、自転車に乗るすべての人に「ある装備」の着用が努力義務化されました。それは何？',
+            choices: ['ヘルメット', 'サングラス', '手袋', '鈴'],
+            answer: 'ヘルメット'
+        },
+        {
+            question: '信号が「赤色」の点滅をしている時、車や自転車はどうしなければならない？',
+            choices: ['注意してそのまま進む', '必ず一時停止し、安全を確認して進む', '青になるまで待つ', 'すぐに引き返す'],
+            answer: '必ず一時停止し、安全を確認して進む'
+        },
+        {
+            question: '「特定小型原動機付自転車」（電動キックボードなど）は、原則として何歳以上であれば運転免許がなくても運転できる？',
+            choices: ['12歳以上', '16歳以上', '18歳以上', '年齢制限はない'],
+            answer: '16歳以上'
+        },
+        {
+            question: '横断歩道に歩行者がいる時、車はどうするのが正しい？',
+            choices: ['歩行者に注意して通過する', '警音器（クラクション）を鳴らして知らせる', '一時停止して歩行者に道を譲る', 'ライトを点滅させて通過する'],
+            answer: '一時停止して歩行者に道を譲る'
+        },
+        {
+            question: '「飲酒運転」は、法律でどう定められている？',
+            choices: ['少しなら飲んでも良い', '絶対に禁止されている', 'ビール1杯までなら良い', '自転車なら問題ない'],
+            answer: '絶対に禁止されている'
+        }
+    ];
 
-let gameInProgress = true;
-let obstacles = [];
-let obstacleTimer;
-let gameTimer;
+    let currentQuizIndex = 0;
+    let score = 0;
+    let shuffledQuizzes = [];
 
-// プレイヤーの移動
-function movePlayer() {
-    if (keys.ArrowLeft && playerX > 0) {
-        playerX -= PLAYER_SPEED;
+    // --- ゲームのロジック ---
+
+    // 1. ゲームの初期化
+    function startGame() {
+        score = 0;
+        currentQuizIndex = 0;
+        shuffledQuizzes = quizData.sort(() => Math.random() - 0.5);
+        showQuiz();
     }
-    if (keys.ArrowRight && playerX + PLAYER_WIDTH < GAME_WIDTH) {
-        playerX += PLAYER_SPEED;
+
+    // 2. クイズの表示
+    function showQuiz() {
+        if (currentQuizIndex >= shuffledQuizzes.length || score >= CLEAR_SCORE) {
+            gameClear();
+            return;
+        }
+
+        const quiz = shuffledQuizzes[currentQuizIndex];
+        questionElement.textContent = quiz.question;
+        choicesContainer.innerHTML = '';
+
+        quiz.choices.forEach(choice => {
+            const button = document.createElement('button');
+            button.textContent = choice;
+            
+            const handler = (e) => {
+                e.preventDefault(); 
+                checkAnswer(choice, quiz.answer);
+            };
+
+            button.addEventListener('click', handler);
+            button.addEventListener('touchstart', handler); // スマホ対応
+            choicesContainer.appendChild(button);
+        });
     }
-    player.style.left = playerX + 'px';
-}
 
-// 障害物を生成
-function createObstacle() {
-    const obstacle = document.createElement('div');
-    obstacle.className = 'obstacle';
-    obstacle.style.left = Math.random() * (GAME_WIDTH - 40) + 'px'; // ランダムなX位置
-    gameContainer.appendChild(obstacle);
-    obstacles.push(obstacle);
-}
-
-// 障害物を移動
-function moveObstacles() {
-    for (let i = obstacles.length - 1; i >= 0; i--) {
-        const obstacle = obstacles[i];
-        let obstacleY = obstacle.offsetTop + OBSTACLE_SPEED;
-
-        if (obstacleY > GAME_HEIGHT) {
-            // 画面外に出たら削除
-            obstacle.remove();
-            obstacles.splice(i, 1);
+    // 3. 回答のチェック
+    function checkAnswer(selectedChoice, correctAnswer) {
+        if (selectedChoice === correctAnswer) {
+            score++;
+            scoreElement.textContent = score;
+            alert('正解！');
         } else {
-            obstacle.style.top = obstacleY + 'px';
-            // 当たり判定
-            checkCollision(obstacle);
+            alert(`不正解...\n正解は「${correctAnswer}」でした。`);
+        }
+
+        currentQuizIndex++;
+        showQuiz();
+    }
+
+    // 4. ゲームクリア処理
+    function gameClear() {
+        if (score >= CLEAR_SCORE) {
+            questionElement.textContent = '全問正解！安全運転ですね！';
+            choicesContainer.innerHTML = '';
+            resultArea.style.display = 'block';
+        } else {
+            alert('残念！正解数が足りなかった。\nもう一度挑戦！');
+            startGame();
         }
     }
-}
 
-// 当たり判定
-function checkCollision(obstacle) {
-    const playerRect = player.getBoundingClientRect();
-    const obstacleRect = obstacle.getBoundingClientRect();
+    // --- イベントリスナー ---
+    backButton.addEventListener('click', () => {
+        // spots.js の報酬名に合わせる
+        window.location.href = '../../index.html?reward=貝殻&success=true';
+    });
 
-    if (
-        playerRect.left < obstacleRect.right &&
-        playerRect.right > obstacleRect.left &&
-        playerRect.top < obstacleRect.bottom &&
-        playerRect.bottom > obstacleRect.top
-    ) {
-        // 当たった！
-        alert('クラッシュ！もう一度！');
-        resetGame();
-    }
-}
-
-// ゲームをリセット（やり直し）
-function resetGame() {
-    // 既存の障害物をすべて削除
-    obstacles.forEach(obstacle => obstacle.remove());
-    obstacles = [];
-    
-    // プレイヤー位置をリセット
-    playerX = 130;
-    player.style.left = playerX + 'px';
-}
-
-// ゲームクリア処理
-function gameClear() {
-    gameInProgress = false;
-    clearInterval(obstacleTimer); // 障害物の生成を停止
-    clearTimeout(gameTimer);     // ゲームタイマーを停止
-    resultArea.style.display = 'block';
-}
-
-// ゲームループ
-function gameLoop() {
-    if (!gameInProgress) return;
-
-    movePlayer();
-    moveObstacles();
-
-    requestAnimationFrame(gameLoop);
-}
-
-// キー入力イベントリスナー
-document.addEventListener('keydown', (e) => {
-    if (e.key in keys) {
-        keys[e.key] = true;
-    }
+    // --- ゲーム開始 ---
+    startGame();
 });
-document.addEventListener('keyup', (e) => {
-    if (e.key in keys) {
-        keys[e.key] = false;
-    }
-});
-
-// マップに戻るボタンの処理
-backButton.addEventListener('click', () => {
-    // ★重要：報酬と成功フラグを付けてマップ画面に戻る
-    window.location.href = '../../index.html?reward=おしゃれな貝殻&success=true';
-});
-
-// ゲーム開始
-gameLoop();
-obstacleTimer = setInterval(createObstacle, OBSTACLE_INTERVAL);
-
-// 20秒間走り切ったらクリア
-gameTimer = setTimeout(gameClear, 20000);

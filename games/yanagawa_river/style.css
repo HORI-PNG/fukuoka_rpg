@@ -7,49 +7,9 @@ body {
     color: #004d40; /* 濃い緑 */
 }
 
-#game-container {
-    width: 90%;
-    max-width: 500px;
-    padding: 20px;
-    background-color: #80cbc4; /* 川の色 */
+canvas {
     border: 2px solid #004d40;
-    border-radius: 5px;
-}
-
-#timing-bar-container {
-    position: relative;
-    width: 100%;
-    height: 40px;
-    background-color: #4db6ac; /* 濃い川の色 */
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-#timing-marker {
-    position: absolute;
-    width: 50px; /* 成功エリアの幅 */
-    height: 100%;
-    background-color: #a5d6a7; /* 成功エリア（緑） */
-    left: 40px; /* 左端から少し離す */
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-}
-
-#timing-cursor {
-    position: absolute;
-    width: 10px; /* カーソルの幅 */
-    height: 100%;
-    background-color: #b0bec5; /* 舟（カーソル）の色 */
-    border-right: 2px solid #37474f;
-    
-    /* 往復アニメーション (1.5秒で往復) */
-    animation: move-cursor 1.5s linear infinite;
-}
-
-/* アニメーションの定義 */
-@keyframes move-cursor {
-    0% { left: 0; }
-    50% { left: calc(100% - 10px); } /* 右端へ */
-    100% { left: 0; } /* 左端へ戻る */
+    background-color: #80cbc4; /* 川の色 */
 }
 
 #status-board {

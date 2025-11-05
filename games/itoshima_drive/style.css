@@ -4,57 +4,58 @@ body {
     align-items: center;
     font-family: sans-serif;
     background-color: #ffdab9; /* 夕焼けっぽい色 */
+    color: #5d4037; /* 濃い茶色 */
+    min-height: 100vh;
+}
+
+h1 {
+    color: #bf360c; /* 濃い夕焼け色 */
 }
 
 #game-container {
-    width: 300px;
-    height: 500px;
-    border: 2px solid #333;
-    background-color: #666; /* 道路の色 */
-    position: relative;
-    overflow: hidden; /* 障害物がはみ出たら消す */
-    
-    /* 道路の白線アニメーション */
-    background-image: linear-gradient(
-        white 40%, 
-        transparent 40%, 
-        transparent 60%, 
-        white 60%
-    );
-    background-size: 10px 100px; /* 白線の幅と間隔 */
-    animation: drive 0.5s linear infinite;
+    width: 90%;
+    max-width: 500px;
+    background-color: white;
+    border: 3px solid #ff8a65; /* オレンジ色 */
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 15px;
 }
 
-/* 道路スクロールのアニメーション */
-@keyframes drive {
-    from { background-position: center 0; }
-    to { background-position: center 100px; }
+#quiz-question {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    min-height: 80px;
 }
 
-#player {
-    width: 40px;
-    height: 60px;
-    background-color: blue; /* プレイヤー（車） */
-    position: absolute;
-    bottom: 20px;
-    left: 130px; /* 初期位置（中央） */
+#quiz-choices button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-top: 10px;
+    font-size: 1.1em;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+#quiz-choices button:hover {
+    background-color: #e0e0e0;
 }
 
-.obstacle {
-    width: 40px;
-    height: 40px;
-    background-color: red; /* 障害物 */
-    position: absolute;
-    top: -50px; /* 画面の上から出現 */
+#status-board {
+    font-size: 1.2em;
+    margin: 15px 0;
 }
 
 /* 結果表示 */
 .result-area {
-    margin-top: 20px;
+    margin-top: 10px;
     padding: 20px;
     text-align: center;
     background-color: white;
-    border: 2px solid #4682b4;
+    border: 2px solid #ff8a65;
     border-radius: 10px;
 }
 #back-to-map {

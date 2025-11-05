@@ -2,22 +2,18 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>柳川の川下り - どんこ舟リズム漕ぎ</title>
+    <title>柳川の川下り - 障害物回避</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>どんこ舟リズム漕ぎ</h1>
-    <p>緑色のエリアで [スペースキー] を押して、舟を漕ごう！</p>
-
-    <div id="game-container">
-        <div id="timing-bar-container">
-            <div id="timing-marker"></div>
-            <div id="timing-cursor"></div>
-        </div>
-    </div>
+    <h1>柳川 障害物回避</h1>
+    <p>障害物（赤い橋）を避けよう！</p>
+    <p>左右キーで舟（青色）を操作 (5回成功でクリア)</p>
+    
+    <canvas id="game-canvas" width="300" height="500"></canvas>
 
     <div id="status-board">
-        成功: <span id="success-count">0</span> / 失敗: <span id="miss-count">0</span>
+        成功回数: <span id="success-count">0</span> / 5
     </div>
 
     <div class="result-area" style="display: none;">
