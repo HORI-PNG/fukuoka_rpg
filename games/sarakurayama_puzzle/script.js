@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // スロットの絶対座標を保持
     let slotPositions = [];
 
+    // ★追加：ピースの「元の位置」を保存する
+    const pieceOriginalPositions = new Map();
+
     // スロットの絶対座標（ページ全体）を計算・再計算する関数
     function calculateSlotPositions() {
         slotPositions = [];
@@ -26,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 top: rect.top + window.scrollY,
                 right: rect.right + window.scrollX,
                 bottom: rect.bottom + window.scrollY,
-                element: slot // スロット要素自体
+                element: slot
             });
         });
     }
@@ -35,6 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializePieces() {
         let pieceIndexes = [0, 1, 2, 3, 4, 5, 6, 7, 8];
         pieceIndexes.sort(() => Math.random() - 0.5);
+        
+        const containerRect = pieceContainer.getBoundingClientRect();
         
         pieceIndexes.forEach((index, i) => {
             const piece = document.createElement('div');
@@ -50,87 +55,87 @@ document.addEventListener('DOMContentLoaded', () => {
             piece.style.left = `${x}px`;
             piece.style.top = `${y}px`;
 
-            // ★PCのマウスとスマホのタッチ両対応の「pointerdown」イベントに変更
+            // ★追加：元の相対座標を保存
+            pieceOriginalPositions.set(piece, { x: x, y: y });
+
             piece.addEventListener('pointerdown', onDragStart);
-            
             pieceContainer.appendChild(piece);
         });
     }
 
-    // --- Pointerイベント処理 (ドラッグ＆ドロップの代わり) ---
+    // --- Pointerイベント処理 ---
 
-    // ピースを掴んだ時 (マウスダウンまたはタッチスタート)
+    // ピースを掴んだ時
     function onDragStart(e) {
-        if (e.target.classList.contains('snapped')) return; // 配置済みは動かさない
+        if (e.target.classList.contains('snapped')) return;
 
         e.preventDefault();
         draggingPiece = e.target;
         draggingPiece.classList.add('dragging');
-        draggingPiece.setPointerCapture(e.pointerId); // 指（ポインタ）をこの要素に固定
+        draggingPiece.setPointerCapture(e.pointerId); 
 
         const pieceRect = draggingPiece.getBoundingClientRect();
+        const containerRect = pieceContainer.getBoundingClientRect();
         
-        // ピースの左上端から、指の位置までのズレを計算
-        offsetX = e.clientX - pieceRect.left;
-        offsetY = e.clientY - pieceRect.top;
+        // ★修正：ピースの「ページ絶対座標」を計算
+        // (コンテナのページ座標 + ピースのコンテナ内座標)
+        const pieceAbsX = (containerRect.left + window.scrollX) + draggingPiece.offsetLeft;
+        const pieceAbsY = (containerRect.top + window.scrollY) + draggingPiece.offsetTop;
+
+        // ★修正：指の「ページ絶対座標」とのズレを計算
+        offsetX = e.pageX - pieceAbsX;
+        offsetY = e.pageY - pieceAbsY;
         
         // ピースを body 直下に移動させ、座標の基準をページ全体にする
         document.body.appendChild(draggingPiece);
 
-        // ピースを指の位置（ページの絶対座標）に合わせる
-        draggingPiece.style.left = `${e.pageX - offsetX}px`;
-        draggingPiece.style.top = `${e.pageY - offsetY}px`;
+        // ★修正：計算した絶対座標で再配置
+        draggingPiece.style.left = `${pieceAbsX}px`;
+        draggingPiece.style.top = `${pieceAbsY}px`;
 
-        // move と up (leave) イベントは document 全体で監視する
         document.addEventListener('pointermove', onDragMove);
         document.addEventListener('pointerup', onDragEnd);
-        document.addEventListener('pointercancel', onDragEnd); // 予期せぬ終了
+        document.addEventListener('pointercancel', onDragEnd);
     }
 
-    // ピースを動かしている時 (マウスムーブまたはタッチムーブ)
+    // ピースを動かしている時
     function onDragMove(e) {
         if (!draggingPiece) return;
         e.preventDefault();
 
-        // ピースを指（マウス）に追従させる
+        // ピースを指（マウス）に追従させる（ページ絶対座標）
         draggingPiece.style.left = `${e.pageX - offsetX}px`;
         draggingPiece.style.top = `${e.pageY - offsetY}px`;
     }
 
-    // ピースを離した時 (マウスアップまたはタッチエンド)
+    // ピースを離した時
     function onDragEnd(e) {
         if (!draggingPiece) return;
         e.preventDefault();
 
         draggingPiece.classList.remove('dragging');
-        draggingPiece.releasePointerCapture(e.pointerId); // ポインタ固定を解除
+        draggingPiece.releasePointerCapture(e.pointerId); 
 
-        // イベントリスナーを解除
         document.removeEventListener('pointermove', onDragMove);
         document.removeEventListener('pointerup', onDragEnd);
         document.removeEventListener('pointercancel', onDragEnd);
 
-        // --- 当たり判定 ---
         const pieceRect = draggingPiece.getBoundingClientRect();
-        // ピースの中心座標（ページの絶対座標）
         const pieceCenterX = pieceRect.left + window.scrollX + (pieceRect.width / 2);
         const pieceCenterY = pieceRect.top + window.scrollY + (pieceRect.height / 2);
 
         let snapped = false;
-        calculateSlotPositions(); // 念のためスロット座標を再計算
+        calculateSlotPositions();
 
         for (const slot of slotPositions) {
-            // ピースの中心がスロットの範囲内にあるか
             if (
                 pieceCenterX > slot.left && pieceCenterX < slot.right &&
                 pieceCenterY > slot.top && pieceCenterY < slot.bottom
             ) {
-                // スロットにハマった！
-                // インデックス（data-index）が一致するか？
                 if (slot.index === draggingPiece.dataset.index) {
                     // 正解！
-                    slot.element.appendChild(draggingPiece); // スロット（div）にピース（div）を入れる
-                    draggingPiece.style.left = '0'; // スロット内の(0,0)に配置
+                    slot.element.appendChild(draggingPiece); 
+                    draggingPiece.style.left = '0';
                     draggingPiece.style.top = '0';
                     draggingPiece.classList.add('snapped');
                     
@@ -141,16 +146,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         showResult();
                     }
                 }
-                break; // スロット判定終了
+                break; 
             }
         }
         
         if (!snapped) {
-            // スナップしなかった場合、ピース置き場に戻す
+            // ★修正：スナップしなかった場合、ピース置き場に「元の位置」に戻す
             pieceContainer.appendChild(draggingPiece);
-            // ピース置き場の中での座標（簡易的に左上に戻す）
-            draggingPiece.style.left = '10px';
-            draggingPiece.style.top = '10px';
+            const originalPos = pieceOriginalPositions.get(draggingPiece);
+            if (originalPos) {
+                draggingPiece.style.left = `${originalPos.x}px`;
+                draggingPiece.style.top = `${originalPos.y}px`;
+            } else {
+                // 念のためフォールバック
+                draggingPiece.style.left = '10px';
+                draggingPiece.style.top = '10px';
+            }
         }
 
         draggingPiece = null;
@@ -164,11 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '../../index.html?reward=100億ドルの夜景&success=true';
     });
     
-    // --- ゲーム開始 ---
-    calculateSlotPositions(); // 最初にスロット座標を計算
-    initializePieces(); // ピースを配置
+    calculateSlotPositions(); 
+    initializePieces(); 
 
-    // スクロールやリサイズ時にスロット座標を再計算
     window.addEventListener('resize', calculateSlotPositions);
     window.addEventListener('scroll', calculateSlotPositions);
 });
