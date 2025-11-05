@@ -30,3 +30,26 @@ canvas {
     font-size: 1em;
     cursor: pointer;
 }
+#controls-lr {
+    position: fixed; /* 画面に固定 */
+    bottom: 30px;
+    left: 50%; /* 画面中央を基準に */
+    transform: translateX(-50%); /* 中央揃え */
+    display: flex;
+    gap: 100px; /* 左右ボタンの間隔 */
+    z-index: 100;
+}
+#controls-lr button {
+    width: 60px; /* 少し大きめ */
+    height: 60px;
+    font-size: 28px;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 2px solid #555;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+}
+#controls-lr button:active {
+    background-color: rgba(200, 200, 200, 0.9); 
+}

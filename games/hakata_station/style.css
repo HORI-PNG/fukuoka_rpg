@@ -25,3 +25,33 @@ canvas {
     font-size: 1em;
     cursor: pointer;
 }
+#controls {
+    position: fixed; /* 画面に固定 */
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    z-index: 100; /* 他の要素より手前に表示 */
+}
+#controls .middle-row {
+    display: flex;
+    gap: 60px; /* 左右ボタンの間隔 */
+}
+#controls button {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.7); /* 半透明の白 */
+    border: 2px solid #555;
+    border-radius: 50%; /* 丸ボタン */
+    cursor: pointer;
+    user-select: none; /* テキスト選択を防ぐ */
+}
+
+/* ボタンを押した時のスタイル */
+#controls button:active {
+    background-color: rgba(200, 200, 200, 0.9); 
+}

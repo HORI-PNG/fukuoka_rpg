@@ -1,46 +1,43 @@
+// ★追加： HTMLの読み込み完了を待つ
 document.addEventListener('DOMContentLoaded', () => {
+
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
     const resultArea = document.querySelector('.result-area');
     const backButton = document.getElementById('back-to-map');
 
     const PLAYER_SIZE = 25;
-    const GOAL_WIDTH = 30; 
-    const ENEMY_COUNT = 15;
+    const GOAL_WIDTH = 30;
+    const ENEMY_COUNT = 6;
     const ENEMY_SIZE = 20;
 
-    // プレイヤー（スワンボート）
     let player = {
-        x: 20, // ★修正：スタート位置 (左端)
-        y: canvas.height / 2 - PLAYER_SIZE / 2, // ★修正：スタート位置 (中央)
+        x: 20,
+        y: canvas.height / 2 - PLAYER_SIZE / 2,
         width: PLAYER_SIZE,
         height: PLAYER_SIZE,
         color: 'white',
         vx: 0,
         vy: 0,
-        speed: 0.2, // ★調整：加速力を落とす (速すぎるため 0.5 -> 0.2)
-        friction: 0.98 // ★調整：摩擦を強める（慣性を減らす 0.96 -> 0.98)
+        speed: 0.2,
+        friction: 0.98
     };
 
-    // スタート地点
     const startPoint = {
         x: 20,
         y: canvas.height / 2 - PLAYER_SIZE / 2
     };
 
-    // ゴール
     const goal = {
-        x: canvas.width - GOAL_WIDTH, // ★修正：ゴール位置 (右端)
+        x: canvas.width - GOAL_WIDTH,
         y: 0,
         width: GOAL_WIDTH,
-        height: canvas.height, // ★修正：ゴール位置 (右端全体)
+        height: canvas.height,
         color: 'green'
     };
 
-    // カモ（敵）
     let enemies = [];
 
-    // キー入力の状態
     let keys = {
         ArrowUp: false,
         ArrowDown: false,
@@ -50,22 +47,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let gameInProgress = true;
 
-    // カモの初期化 (★修正：上下に動くように変更)
     function createEnemies() {
         enemies = [];
         for (let i = 0; i < ENEMY_COUNT; i++) {
             enemies.push({
-                x: GOAL_WIDTH + 50 + Math.random() * (canvas.width - GOAL_WIDTH - 150), // スタートとゴールを避ける
+                x: GOAL_WIDTH + 50 + Math.random() * (canvas.width - GOAL_WIDTH - 150),
                 y: Math.random() * (canvas.height - ENEMY_SIZE),
                 width: ENEMY_SIZE,
                 height: ENEMY_SIZE,
                 color: 'red',
-                speed: (Math.random() > 0.5 ? 1 : -1) * (0.5 + Math.random() * 1) // ★調整：少し遅く
+                speed: (Math.random() > 0.5 ? 1 : -1) * (0.5 + Math.random() * 1)
             });
         }
     }
 
-    // 描画関数 (変更なし)
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = goal.color;
@@ -78,18 +73,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // カモを動かす (★修正：上下移動)
     function moveEnemies() {
         enemies.forEach(enemy => {
-            enemy.y += enemy.speed; // Y方向（上下）に動く
-            // 壁で跳ね返る
+            enemy.y += enemy.speed;
             if (enemy.y + enemy.height > canvas.height || enemy.y < 0) {
                 enemy.speed *= -1;
             }
         });
     }
 
-    // プレイヤーの操作と移動 (★調整：壁判定を修正)
     function movePlayer() {
         if (keys.ArrowUp) player.vy -= player.speed;
         if (keys.ArrowDown) player.vy += player.speed;
@@ -102,28 +94,13 @@ document.addEventListener('DOMContentLoaded', () => {
         player.x += player.vx;
         player.y += player.vy;
 
-        // 画面端の壁判定 (★修正)
-        if (player.x < 0) {
-            player.x = 0;
-            player.vx = 0;
-        }
-        if (player.x + player.width > canvas.width) {
-            player.x = canvas.width - player.width;
-            player.vx = 0;
-        }
-        if (player.y < 0) {
-            player.y = 0;
-            player.vy = 0;
-        }
-        if (player.y + player.height > canvas.height) {
-            player.y = canvas.height - player.height;
-            player.vy = 0;
-        }
+        if (player.x < 0) { player.x = 0; player.vx = 0; }
+        if (player.x + player.width > canvas.width) { player.x = canvas.width - player.width; player.vx = 0; }
+        if (player.y < 0) { player.y = 0; player.vy = 0; }
+        if (player.y + player.height > canvas.height) { player.y = canvas.height - player.height; player.vy = 0; }
     }
 
-    // 当たり判定 (ゴール判定を★修正)
     function checkCollision() {
-        // 1. カモとの当たり判定
         for (const enemy of enemies) {
             if (
                 player.x < enemy.x + enemy.width &&
@@ -137,9 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 2. ゴールとの当たり判定 (★修正)
         if (
-            player.x + player.width > goal.x && // プレイヤーの右端がゴールの左端を超えたら
+            player.x + player.width > goal.x &&
             player.x < goal.x + goal.width &&
             player.y < goal.y + goal.height &&
             player.y + player.height > goal.y
@@ -149,19 +125,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // プレイヤーをスタート地点に戻す (★修正)
     function resetPlayer() {
         player.x = startPoint.x;
         player.y = startPoint.y;
         player.vx = 0;
         player.vy = 0;
+        
+        // キー入力もリセット
         keys.ArrowUp = false;
         keys.ArrowDown = false;
         keys.ArrowLeft = false;
         keys.ArrowRight = false;
     }
 
-    // ゲームループ (変更なし)
     function gameLoop() {
         if (!gameInProgress) return;
         movePlayer();
@@ -171,20 +147,51 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(gameLoop);
     }
 
-    // キー入力イベントリスナー (変更なし)
+    // --- ★ここから修正 (キー入力と仮想コントローラの処理) ---
+
     document.addEventListener('keydown', (e) => {
-        if (e.key in keys) keys[e.key] = true;
+        if (e.key in keys) {
+            keys[e.key] = true;
+        }
     });
     document.addEventListener('keyup', (e) => {
-        if (e.key in keys) keys[e.key] = false;
+        if (e.key in keys) {
+            keys[e.key] = false;
+        }
     });
 
-    // マップに戻るボタンの処理 (変更なし)
+    // 仮想コントローラーのボタンとキーのマッピング
+    const controlMapping = {
+        'btn-up': 'ArrowUp',
+        'btn-down': 'ArrowDown',
+        'btn-left': 'ArrowLeft',
+        'btn-right': 'ArrowRight'
+    };
+
+    // 各ボタンにタッチイベント（pointerイベント）を割り当てる
+    for (const [buttonId, key] of Object.entries(controlMapping)) {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            button.addEventListener('pointerdown', (e) => {
+                e.preventDefault(); 
+                keys[key] = true;
+            });
+            button.addEventListener('pointerup', (e) => {
+                e.preventDefault();
+                keys[key] = false;
+            });
+            button.addEventListener('pointerleave', (e) => {
+                keys[key] = false;
+            });
+        }
+    }
+    // --- ★ここまで修正 ---
+
     backButton.addEventListener('click', () => {
         window.location.href = '../../index.html?reward=大濠公園まんじゅう&success=true';
     });
 
-    // ゲーム開始
     createEnemies();
     gameLoop();
-});
+
+}); // ★追加： DOMContentLoaded の閉じカッコ
