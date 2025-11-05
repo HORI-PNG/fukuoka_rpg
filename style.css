@@ -29,18 +29,9 @@ canvas {
 }
 
 /* --- UI要素のスタイル --- */
-/* #start-screen { ... } <- 重複していたため削除 */
-
 #start-button { padding: 20px 40px; font-size: 2em; cursor: pointer; }
 
 #special-stage-area { margin: 15px 0; }
-/* #special-stage-button {
-    padding: 12px 28px; font-size: 1.5em; font-weight: bold; color: white;
-    background: linear-gradient(45deg, #ff00ff, #00ffff);
-    border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-} */
-
-/* #reset-button { ... } <- 重複していたため削除 */
 
 #item-box {
     width: 100%; max-width: 384px; margin-top: 10px; padding: 10px;
@@ -74,7 +65,7 @@ canvas {
 
 #toggle-items-button {
     position: fixed; bottom: 30px; 
-    left: 150px; /* ★修正： 100px から 150px に変更 */
+    left: 210px; 
     width: 60px; height: 60px;
     font-size: 2em; background-color: rgba(255, 255, 255, 0.8);
     border: 2px solid #555; border-radius: 50%; cursor: pointer; z-index: 100;
@@ -110,7 +101,6 @@ canvas {
     bottom: 30px;
     left: 30px;
     z-index: 100;
-    /* z-index: 100; <- 重複していたため削除 */
     display: flex; /* フレックスボックスレイアウトを使用 */
     flex-direction: row; /* 横並びを指定 */
     gap: 10px; /* ボタン間の隙間を設定 */
@@ -134,7 +124,6 @@ canvas {
     background-color: rgba(255, 105, 180, 1); 
 }
 
-/* ★追加： #delete-data-button にもスタイルを適用 */
 #delete-data-button {
     width: 50px;
     height: 50px;
@@ -213,6 +202,24 @@ canvas {
     transform: scale(1.1);
 }
 
+#show-map-button {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    background-color: rgba(182, 219, 255, 0.8); /* 他のボタンと色を変える（水色） */
+    border: 2px solid #005a9c; 
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#show-map-button:active {
+    background-color: rgba(130, 190, 255, 1); 
+}
+
 .game-reset-button {
     display: block;
     margin: 15px auto;
@@ -225,4 +232,38 @@ canvas {
 }
 .game-reset-button:hover {
     background-color: #d32f2f;
+}
+
+.map-modal-overlay {
+    display: none; /* 初期状態は非表示 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 300; /* 最前面に表示 */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.map-modal-overlay img {
+    max-width: 90%;
+    max-height: 85%;
+    border: 3px solid white;
+    border-radius: 10px;
+}
+
+#close-map-button {
+    margin-top: 20px;
+    padding: 15px 30px;
+    font-size: 1.5em;
+    cursor: pointer;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 10px;
 }

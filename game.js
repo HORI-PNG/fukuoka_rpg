@@ -140,6 +140,10 @@ window.addEventListener('load', () => {
     const toggleItemsButton = document.getElementById('toggle-items-button');
     const itemsBox = document.getElementById('item-box');
 
+    const showMapButton = document.getElementById('show-map-button');
+    const mapModal = document.getElementById('map-modal');
+    const closeMapButton = document.getElementById('close-map-button');
+
     if (resetButton) {
         resetButton.addEventListener('click', () => {
             if (confirm('プレイヤーを切り替えてログイン画面に戻りますか？')) {
@@ -169,6 +173,18 @@ window.addEventListener('load', () => {
                     alert('データ削除中にエラーが発生しました。');
                 }
             }
+        });
+    }
+
+    if (showMapButton && mapModal) {
+        showMapButton.addEventListener('click', () => {
+            // mapModal の display を 'none' から 'flex' に変更して表示
+            mapModal.style.display = 'flex';
+        });
+    }
+    if (closeMapButton && mapModal) {
+        closeMapButton.addEventListener('click', () => {
+            mapModal.style.display = 'none';
         });
     }
 
