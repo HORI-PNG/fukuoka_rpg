@@ -18,8 +18,8 @@ export const spots = [
     {
         name: 'マリンワールド海の中道',
         type: 'minigame',
-        x: 400,
-        y: 200,
+        x: 80,
+        y: 260,
         width: 100,
         height: 100,
         url: './games/marine_world/index.html',
@@ -28,18 +28,19 @@ export const spots = [
     {
         name: '二見ヶ浦の夫婦岩',
         type: 'minigame',
-        x: 650,
-        y: 100,
+        x: 110,
+        y: 430,
         width: 100,
-        height: 300,
+        height: 100,
         url: './games/futamigaura/index.html',
         reward: '縁結びのお守り'
     },
     {
+        // これ消そう
         name: '糸島',
         type: 'minigame',
-        x: 250,
-        y: 250,
+        x: 620,
+        y: 60,
         width: 100,
         height: 100,
         url: './games/itoshima_craft/index.html',
@@ -48,8 +49,8 @@ export const spots = [
     {
         name: '柳川の川下り',
         type: 'minigame',
-        x: 120,
-        y: 500,
+        x: 300,
+        y: 400,
         width: 100,
         height: 100,
         url: './games/yanagawa_river/index.html',
@@ -58,8 +59,8 @@ export const spots = [
     {
         name: '小倉城',
         type: 'minigame',
-        x: 600,
-        y: 200,
+        x: 580,
+        y: 180,
         width: 100,
         height: 100,
         url: './games/kokura_castle/index.html',
@@ -68,8 +69,8 @@ export const spots = [
     {
         name: '宗像大社',
         type: 'minigame',
-        x: 530,
-        y: 100,
+        x: 610,
+        y: 60,
         width: 100,
         height: 100,
         url: './games/munakata_adv/index.html',
@@ -78,8 +79,8 @@ export const spots = [
     {
         name: '太宰府天満宮',
         type: 'minigame',
-        x: 350,
-        y: 600,
+        x: 410,
+        y: 440,
         width: 100,
         height: 100,
         url: './games/dazaifu_quest/index.html',
@@ -88,9 +89,9 @@ export const spots = [
     {
         name: '門司港',
         type: 'minigame', // typeを'minigame'に変更
-        x: 650,
-        y: 100,
-        width: 100,
+        x: 100,
+        y: 160,
+        width: 180,
         height: 100,
         url: './games/mojiko/index.html', // 門司港のゲームURLを追加
         reward: '焼きカレー'
@@ -99,18 +100,18 @@ export const spots = [
         name: '福岡タワー',
         type: 'minigame',
         x: 400,
-        y: 400,
-        width: 50,
-        height: 100,
+        y: 200,
+        width: 100,
+        height: 250,
         url: './games/fukuoka_tower/index.html',
         reward: '明太子'
     },
     {
         name: 'PayPayドーム',
         type: 'minigame',
-        x: 720, // 左からの位置
-        y: 400, // 上からの位置
-        width: 100,
+        x: 520,
+        y: 280,
+        width: 150,
         height: 100,
         url: './games/paypay_dome/index.html', // テスト用のURL
         reward: 'ホームラン記念ボール'
@@ -119,37 +120,27 @@ export const spots = [
         name: 'キャナルシティ博多',
         type: 'minigame',
         x: 500,
-        y: 300,
-        width: 50,
+        y: 360,
+        width: 150,
         height: 50,
-        url: './game/canalcity/index.html',
+        url: './games/canalcity/index.html',
         reward: 'もつ鍋'
-    },
-    {
-        name: 'テストエリア',
-        type: 'quiz',
-        x: 10, // 左からの位置
-        y: 490, // 上からの位置
-        width: 100,
-        height: 100,
-        url: 'https://example.com/', // テスト用のURL
-        reward: 'デバッグ成功！'
     },
     {
         name: '中州屋台',
         type: 'minigame', // タイプを'minigame'に変更（'quiz'のままでも動作します）
-        x: 540,
-        y: 500,
-        width: 100,
-        height: 100,
+        x: 560,
+        y: 420,
+        width: 150,
+        height: 50,
         url: './games/yatai_shooting/index.html', 
         reward: 'ラーメン' // 
     },
     {
         name: '大濠公園',
         type: 'minigame', // タイプを'minigame'に変更（'quiz'のままでも動作します）
-        x: 480,
-        y: 430,
+        x: 250,
+        y: 350,
         width: 100,
         height: 100,
         url: './games/ohori_park/index.html', 
@@ -158,19 +149,19 @@ export const spots = [
     {
         name: '博多駅',
         type: 'minigame', // タイプを'minigame'に変更（'quiz'のままでも動作します）
-        x: 700,
-        y: 280,
-        width: 100,
-        height: 100,
+        x: 490,
+        y: 120,
+        width: 130,
+        height: 70,
         url: './games/hakata_station/index.html', 
         reward: '博多通りもん' // 
     },
     {
         name: '河内藤園',
         type: 'minigame', // タイプを'minigame'に変更（'quiz'のままでも動作します）
-        x: 150,
-        y: 600,
-        width: 100,
+        x: 690,
+        y: 250,
+        width: 150,
         height: 100,
         url: './games/kawachi_fuji/index.html', 
         reward: '藤のしおり' // 
@@ -178,19 +169,19 @@ export const spots = [
     {
         name: '志摩サンセットロード（糸島）',
         type: 'minigame', // タイプを'minigame'に変更（'quiz'のままでも動作します）
-        x: 200,
+        x: 680,
         y: 150,
-        width: 150,
-        height: 80,
+        width: 100,
+        height: 100,
         url: './games/itoshima_drive/index.html', 
         reward: '貝殻' // 
     },
     {
         name: '皿倉山',
         type: 'minigame', // タイプを'minigame'に変更（'quiz'のままでも動作します）
-        x: 750,
-        y: 100,
-        width: 100,
+        x: 220,
+        y: 90,
+        width: 140,
         height: 100,
         url: './games/sarakurayama_puzzle/index.html', 
         reward: '100億ドルの夜景' // 
