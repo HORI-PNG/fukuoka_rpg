@@ -3,18 +3,17 @@ body {
     flex-direction: column;
     align-items: center;
     font-family: sans-serif;
-    background-color: #e0f2f1; /* 薄い水色 */
-    color: #004d40; /* 濃い緑 */
+    background-color: #f0f0f0;
 }
 
 canvas {
-    border: 2px solid #004d40;
-    background-color: #80cbc4; /* 川の色 */
+    border: 2px solid #333;
+    background-color: #d3d3d3; /* 城壁の色（イメージ） */
 }
 
-#status-board {
+#score-board {
     font-size: 1.2em;
-    margin: 15px 0;
+    margin: 10px 0;
 }
 
 /* 結果表示 */
@@ -23,7 +22,7 @@ canvas {
     padding: 20px;
     text-align: center;
     background-color: white;
-    border: 2px solid #004d40;
+    border: 2px solid #4682b4;
     border-radius: 10px;
 }
 #back-to-map {
@@ -31,6 +30,8 @@ canvas {
     font-size: 1em;
     cursor: pointer;
 }
+
+/* ★修正： 仮想ボタンのCSSを右下配置用に変更 */
 #controls {
     position: fixed; 
     bottom: 30px; 
@@ -43,12 +44,13 @@ canvas {
 }
 #controls .middle-row { 
     display: flex; 
-    gap: 60px; 
+    gap: 10px; /* ★ボタン間の隙間を調整 */
+    align-items: center; /* ボタンの縦位置を中央揃え */
 }
 #controls button {
-    width: 50px; 
-    height: 50px; 
-    font-size: 24px; 
+    width: 60px; /* サイズを統一 */
+    height: 60px; 
+    font-size: 28px; 
     color: #333;
     background-color: rgba(255, 255, 255, 0.7); 
     border: 2px solid #555;
@@ -58,4 +60,17 @@ canvas {
 }
 #controls button:active {
     background-color: rgba(200, 200, 200, 0.9); 
+}
+
+/* ★追加： 射撃ボタンのスタイル */
+#controls #btn-fire {
+    background-color: rgba(255, 80, 80, 0.8); /* 赤色 */
+    color: white;
+    border-color: #b00;
+    width: 70px; /* 射撃ボタンを少し大きく */
+    height: 70px;
+    font-size: 32px;
+}
+#controls #btn-fire:active {
+    background-color: rgba(200, 50, 50, 0.9); 
 }

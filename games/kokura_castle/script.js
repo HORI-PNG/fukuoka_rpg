@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const backButton = document.getElementById('back-to-map');
     const scoreElement = document.getElementById('score');
     const bgImage = new Image();
-    bgImage.src = './小倉城.png'
+    // bgImage.src = './小倉城.png'
 
     const PLAYER_WIDTH = 50;
     const PLAYER_HEIGHT = 30;
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ENEMY_SPEED = 1.5;
     const ENEMY_WIDTH = 30;
     const ENEMY_HEIGHT = 30;
-    const ENEMY_SPAWN_INTERVAL = 1000; // 1秒ごとに敵が出現
+    const ENEMY_SPAWN_INTERVAL = 2000; // 1秒ごとに敵が出現
 
     let player = {
         x: canvas.width / 2 - PLAYER_WIDTH / 2,
@@ -40,9 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // 背景画像を描画
-    if (bgImage.complete) { // 画像が読み込み完了していたら描画
-        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-    }
+        // if (bgImage.complete) { // 画像が読み込み完了していたら描画
+        //     ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+        // }
 
         // プレイヤー（城）
         ctx.fillStyle = player.color;
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'btn-left': 'ArrowLeft',
         'btn-right': 'ArrowRight'
     };
-    
+
     for (const [buttonId, key] of Object.entries(controlMapping)) {
         const button = document.getElementById(buttonId);
         if (button) {
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    
+
     // 射撃ボタンの処理
     const fireButton = document.getElementById('btn-fire');
     if (fireButton) {
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
+
     // --- ゲーム開始 ---
     enemySpawnTimer = setInterval(spawnEnemy, ENEMY_SPAWN_INTERVAL);
     gameLoop();
