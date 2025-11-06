@@ -1,5 +1,4 @@
 import { GameScene } from './src/scenes/GameScene.js';
-import { QuizScene } from './src/scenes/QuizScene.js';
 
 // --- Phaser ゲーム設定 ---
 const config = {
@@ -15,7 +14,7 @@ const config = {
         default: 'arcade',
         arcade: { gravity: { y: 0 }, debug: false }
     },
-    scene: [GameScene, QuizScene]
+    scene: [GameScene]
 };
 
 const SUPABASE_URL = 'https://ztuuvaubrldzhgmbcfcm.supabase.co';
