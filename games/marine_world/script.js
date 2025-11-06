@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 魚の生成 ---
     function createFish() {
-        const radius = 10 + Math.random() * 5;
+        const radius = 20 + Math.random() * 10;
         const x = Math.random() * (canvas.width - radius * 2) + radius;
         const y = Math.random() * (canvas.height - radius * 2) + radius;
         const speed = 1 + Math.random();

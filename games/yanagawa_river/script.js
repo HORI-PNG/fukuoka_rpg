@@ -144,6 +144,38 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '../../index.html?reward=うなぎのせいろ蒸し&success=true';
     });
 
+    const controlMapping = {
+        'btn-left': 'ArrowLeft',
+        'btn-right': 'ArrowRight'
+    };
+
+    for (const [buttonId, key] of Object.entries(controlMapping)) {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            // 柳川ゲームはキーを押した瞬間に移動するロジック (keydown) を使う
+            button.addEventListener('pointerdown', (e) => {
+                e.preventDefault(); 
+
+                if (!gameInProgress || !canMove) return;
+
+                if (key === 'ArrowLeft') {
+                    if (playerLane > 0) {
+                        playerLane--;
+                        canMove = false;
+                    }
+                } else if (key === 'ArrowRight') {
+                    if (playerLane < 2) {
+                        playerLane++;
+                        canMove = false;
+                    }
+                }
+
+                player.x = (LANE_WIDTH * playerLane) + (LANE_WIDTH - PLAYER_WIDTH) / 2;
+                setTimeout(() => { canMove = true; }, 150);
+            });
+        }
+    }
+
     // --- ゲーム開始 ---
     spawnObstacle(); // 最初の障害物を生成
     gameLoop();

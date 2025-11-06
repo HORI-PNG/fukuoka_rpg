@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultArea = document.querySelector('.result-area');
     const backButton = document.getElementById('back-to-map');
     const scoreElement = document.getElementById('score');
+    const bgImage = new Image();
+    bgImage.src = './小倉城.png'
 
     const PLAYER_WIDTH = 50;
     const PLAYER_HEIGHT = 30;
@@ -36,6 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 描画処理 ---
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 背景画像を描画
+    if (bgImage.complete) { // 画像が読み込み完了していたら描画
+        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+    }
 
         // プレイヤー（城）
         ctx.fillStyle = player.color;
@@ -176,6 +183,45 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = '../../index.html?reward=小倉城の瓦&success=true';
     });
 
+    // 仮想コントローラーのボタンとキーのマッピング (左右)
+    const controlMapping = {
+        'btn-left': 'ArrowLeft',
+        'btn-right': 'ArrowRight'
+    };
+    
+    for (const [buttonId, key] of Object.entries(controlMapping)) {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            button.addEventListener('pointerdown', (e) => {
+                e.preventDefault(); 
+                keys[key] = true;
+            });
+            button.addEventListener('pointerup', (e) => {
+                e.preventDefault();
+                keys[key] = false;
+            });
+            button.addEventListener('pointerleave', (e) => {
+                keys[key] = false;
+            });
+        }
+    }
+    
+    // 射撃ボタンの処理
+    const fireButton = document.getElementById('btn-fire');
+    if (fireButton) {
+        fireButton.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            if (gameInProgress) {
+                bullets.push({
+                    x: player.x + player.width / 2 - 2.5,
+                    y: player.y,
+                    width: 5,
+                    height: 10
+                });
+            }
+        });
+    }
+    
     // --- ゲーム開始 ---
     enemySpawnTimer = setInterval(spawnEnemy, ENEMY_SPAWN_INTERVAL);
     gameLoop();
