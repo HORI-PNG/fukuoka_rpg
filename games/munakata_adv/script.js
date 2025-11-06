@@ -4,88 +4,113 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultArea = document.querySelector('.result-area');
     const backButton = document.getElementById('back-to-map');
 
-    // ストーリーデータ
-    // シーンID: { text: "物語", choices: [ { text: "選択肢", next: 次のID } ], result: "win" }
-    const storyData = {
-        0: {
-            text: 'あなたは宗像大社にたどり着いた。三女神の「神宝」を探すため、境内を探索する。まずはどこへ向かう？',
+    // ★クリアに必要なスコア
+    const CLEAR_SCORE = 3;
+
+    // ★ご指定のテーマでクイズデータを作成
+    const quizData = [
+        {
+            question: '問1：名前の由来が「あかい・まるい・おおきい・うまい」である、福岡県産の有名なイチゴの品種は？',
             choices: [
-                { text: '大きな本殿に向かう', next: 1 },
-                { text: '静かな裏山を探索する', next: 2 }
+                { text: 'あまおう', correct: true },
+                { text: 'とよのか', correct: false },
+                { text: 'ゆうべに', correct: false },
             ]
         },
-        1: {
-            text: '本殿に到着した。厳かな雰囲気だ。参拝を済ませると、足元に古い巻物を見つけた。',
+        {
+            question: '問2：毎年7月に開催され、「オイサ」の掛け声で「山笠（やま）」を担いで街を走る、福岡の有名なお祭りは？',
             choices: [
-                { text: '巻物を開く', next: 3 },
-                { text: '神職に届ける', next: 4 }
+                { text: '博多祇園山笠', correct: true },
+                { text: '博多どんたく', correct: false },
+                { text: '放生会（ほうじょうや）', correct: false },
             ]
         },
-        2: {
-            text: '裏山に入った。道は険しく、迷ってしまったようだ。目の前に2つの道がある。',
+        {
+            question: '問3：「1000年に1人の逸材」として有名になった、福岡県出身のアイドル・女優は？',
             choices: [
-                { text: '明るい光が差す道', next: 5 },
-                { text: '古びた鳥居がある道（本殿方面）', next: 1 } // 本殿に戻る
+                { text: '今田美桜', correct: false },
+                { text: '与田祐希 (乃木坂46)', correct: false },
+                { text: '橋本環奈', correct: true },
             ]
         },
-        3: {
-            text: '巻物を開くと、「神宝は高宮にあり」と書かれていた。高宮は裏山にある祭場だ。',
+        {
+            question: '問4：【ホークス問題】2024年シーズンに、投手でありながら盗塁を決め、「40歳以上でのシーズン盗塁」を達成した選手は誰？',
             choices: [
-                { text: '裏山（高宮）へ向かう', next: 6 }
+                { text: '有原航平', correct: false },
+                { text: '和田毅', correct: true },
+                { text: 'L.モイネロ', correct: false },
             ]
-        },
-        4: {
-            text: '神職に届けると、感謝され、神社の案内図をもらった。どうやら神宝は「高宮」という場所にあるらしい。',
-            choices: [
-                { text: '地図を頼りに高宮へ向かう', next: 6 }
-            ]
-        },
-        5: {
-            text: '明るい道を進んだが、行き止まりだった。どうやらここは違ったようだ。',
-            choices: [
-                { text: '引き返して本殿に戻る', next: 1 }
-            ]
-        },
-        6: {
-            text: '高宮に到着した。ここは宗像三女神が降臨した神聖な場所だ。祭壇の中心に、古びた鏡が置かれている。これが神宝に違いない！',
-            choices: [],
-            result: 'win' // クリア
         }
-    };
+    ];
 
-    let currentSceneId = 0; // 現在のシーンID
+    let currentQuestionIndex = 0; // 現在の問題番号
+    let score = 0; // 現在の正解数
+    
+    // ★クイズデータをシャッフル（毎回出題順が変わる）
+    const shuffledQuizzes = quizData.sort(() => Math.random() - 0.5);
 
-    function showScene(sceneId) {
-        const scene = storyData[sceneId];
+    function showQuestion(index) {
         
-        storyText.textContent = scene.text;
-        choicesContainer.innerHTML = ''; // 選択肢をリセット
-
-        if (scene.result === 'win') {
-            // クリア処理
-            setTimeout(() => {
-                document.getElementById('game-container').style.display = 'none';
-                resultArea.style.display = 'block';
-            }, 1500); // 1.5秒待ってクリア画面表示
+        // ★4問解き終わったら結果判定
+        if (index >= shuffledQuizzes.length) {
+            gameResult();
             return;
         }
 
-        scene.choices.forEach(choice => {
+        const scene = shuffledQuizzes[index];
+        
+        // ★ステータス表示（何問目 / 現在のスコア）
+        storyText.innerHTML = `【${index + 1}問目 / 全${shuffledQuizzes.length}問】 (現在 ${score} 問正解)<br><br>${scene.question.replace(/\n/g, '<br>')}`;
+        choicesContainer.innerHTML = '';
+
+        // 選択肢をシャッフルして表示
+        const shuffledChoices = [...scene.choices].sort(() => Math.random() - 0.5);
+
+        shuffledChoices.forEach(choice => {
             const button = document.createElement('button');
             button.textContent = choice.text;
             button.addEventListener('click', () => {
-                currentSceneId = choice.next;
-                showScene(currentSceneId);
+                
+                if (choice.correct === true) {
+                    // ★正解ならスコア加算
+                    alert('正解！');
+                    score++;
+                } else {
+                    // ★不正解
+                    alert('不正解...');
+                }
+                
+                // 次の問題へ
+                currentQuestionIndex++;
+                showQuestion(currentQuestionIndex);
             });
             choicesContainer.appendChild(button);
         });
     }
 
-    // マップに戻るボタンの処理
+    // ★結果判定処理を追加
+    function gameResult() {
+        if (score >= CLEAR_SCORE) {
+            // クリア
+            storyText.innerHTML = `おめでとう！<br>全${shuffledQuizzes.length}問中 ${score}問正解でクリアです！`;
+            choicesContainer.innerHTML = '';
+            setTimeout(() => {
+                document.getElementById('game-container').style.display = 'none';
+                resultArea.style.display = 'block';
+            }, 2000);
+        } else {
+            // 失敗
+            alert(`残念！ ${score}問正解でした。\n${CLEAR_SCORE}問正解でクリアです。\nもう一度挑戦しよう！`);
+            window.location.reload();
+        }
+    }
+
+
+    // マップに戻るボタンの処理 (報酬は「交通安全お守り」のままです)
     backButton.addEventListener('click', () => {
         window.location.href = '../../index.html?reward=交通安全お守り&success=true';
     });
 
-    // ゲーム開始
-    showScene(currentSceneId);
+    // ゲーム開始 (最初の問題を表示)
+    showQuestion(currentQuestionIndex);
 });

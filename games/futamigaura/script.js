@@ -4,49 +4,56 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultArea = document.querySelector('.result-area');
     const backButton = document.getElementById('back-to-map');
 
-    // シナリオデータ
-    const storyData = {
-        0: {
-            text: '夕日が沈みかけている。白い鳥居が美しい。隣には意中の人がいる...！\nさあ、なんと声をかける？',
+    const quizData = [
+        {
+            question: '問1：アリスやユージオ達が暮らしていた村の名前は？',
             choices: [
-                { text: '「今日の夕日、すごく綺麗だね。」', next: 1 },
-                { text: '「...（黙って夕日を見つめる）」', next: 2 },
-                { text: '「ねえ、寒いから早く帰らない？」', next: 3 }
+                { text: 'ルーリッド', correct: true },
+                { text: 'ザッカリア', correct: false },
+                { text: 'セントリア', correct: false },
             ]
         },
-        1: {
-            text: '相手：「本当だね...。こんな素敵な景色、〇〇さんと見れてよかった。」\n（いい雰囲気だ！あと一押し！）',
+        {
+            question: '問2：ノーランガルス帝立修剣学院主席ウォロ・リーバンテインは何流剣術の使い手だったか？',
             choices: [
-                // ★修正： next: 'win' ではなく、result: 'win' を使う
-                { text: '「俺（私）もだよ。...ずっと一緒にいたいな。」', result: 'win' },
-                { text: '「あ、あれカモメかな？（照れ隠し）」', next: 4 }
+                { text: 'ハイ・ノルキア流', correct: true },
+                { text: 'アインクラッド流', correct: false },
+                { text: 'セラルート流', correct: false },
             ]
         },
-        2: {
-            text: '相手：「...（何か言いたそうだが、黙っている）」\n（気まずい雰囲気になってしまった...）',
+        {
+            question: '問3：右目の封印「システム・アラート」のコードナンバーは？',
             choices: [
-                { text: '「ごめん、何か考え事してた！」', next: 1 },
-                { text: '「...（帰りたくないな）」', next: 3 }
+                { text: 'Code 871', correct: true },
+                { text: 'Code 823', correct: false },
+                { text: 'Code 812', correct: false },
             ]
         },
-        3: {
-            text: '相手：「えっ...。そ、そうだね。」\n（完全にムードが壊れてしまった...最初からやり直そう！）',
-            choices: [],
-            result: 'lose'
+        {
+            question: '問4：アリスとキリト・ユージオが剣を交えたのは、セントラルカセドラルの何階？',
+            choices: [
+                { text: '75階', correct: false },
+                { text: '80階', correct: true },
+                { text: '85階', correct: false },
+            ]
         },
-        4: {
-            text: '相手：「え？どこどこ？...あ、本当だ。」\n（...せっかくの雰囲気が台無しになってしまった。やり直し！）',
-            choices: [],
-            result: 'lose'
+        {
+            question: '問5：キリトがソルティリーナの卒業祝いに送った花の名前は？',
+            choices: [
+                { text: 'ゼフィリア', correct: true },
+                { text: 'カトレア', correct: false },
+                { text: 'シノグロッサム', correct: false },
+            ]
         }
-    };
+    ];
 
-    // ★修正：関数全体を修正
-    function showScene(sceneId) {
+    let currentQuestionIndex = 0; // 現在の問題番号
+
+    function showQuestion(index) {
         
-        // ★追加： 'win' が渡された場合は、ここでクリア処理
-        if (sceneId === 'win') {
-            storyText.innerHTML = "相手：「...！ はいっ...！（告白成功だ！）」";
+        // 全問正解した場合 (indexが5になったら)
+        if (index >= quizData.length) {
+            storyText.innerHTML = "全問正解！<br>おめでとう！";
             choicesContainer.innerHTML = ''; // 選択肢を消す
             setTimeout(() => {
                 document.getElementById('game-container').style.display = 'none';
@@ -55,43 +62,40 @@ document.addEventListener('DOMContentLoaded', () => {
             return; // 関数を終了
         }
 
-        const scene = storyData[sceneId];
+        const scene = quizData[index];
         
-        storyText.innerHTML = scene.text.replace(/\n/g, '<br>');
+        storyText.innerHTML = scene.question.replace(/\n/g, '<br>');
         choicesContainer.innerHTML = '';
 
-        // --- 結果の判定 (lose) ---
-        if (scene.result === 'lose') {
-            setTimeout(() => {
-                alert('告白失敗...。もう一度チャンスを！');
-                window.location.reload();
-            }, 1500);
-            return;
-        }
-
         // --- 選択肢の表示 ---
-        scene.choices.forEach(choice => {
+        // 選択肢をシャッフルして表示
+        const shuffledChoices = [...scene.choices].sort(() => Math.random() - 0.5);
+
+        shuffledChoices.forEach(choice => {
             const button = document.createElement('button');
             button.textContent = choice.text;
             button.addEventListener('click', () => {
                 
-                // ★修正： 押された選択肢に result: 'win' があるかチェック
-                if (choice.result === 'win') {
-                    showScene('win'); // 'win' を渡してクリア処理を呼び出す
+                if (choice.correct === true) {
+                    // ★正解なら、次の問題へ
+                    alert('正解！');
+                    currentQuestionIndex++;
+                    showQuestion(currentQuestionIndex);
                 } else {
-                    // それ以外なら next に進む
-                    showScene(choice.next);
+                    // ★不正解なら、リロード（やり直し）
+                    alert('不正解...。最初からやり直し！');
+                    window.location.reload();
                 }
             });
             choicesContainer.appendChild(button);
         });
     }
 
-    // マップに戻るボタンの処理
+    // マップに戻るボタンの処理 (報酬名は元のままです)
     backButton.addEventListener('click', () => {
         window.location.href = '../../index.html?reward=縁結びのお守り&success=true';
     });
 
-    // ゲーム開始
-    showScene(0);
+    // ゲーム開始 (最初の問題を表示)
+    showQuestion(currentQuestionIndex);
 });

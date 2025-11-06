@@ -3,8 +3,10 @@ body {
     flex-direction: column;
     align-items: center;
     font-family: sans-serif;
-    background: linear-gradient(to bottom, #ffcc80, #f57c00); /* 夕焼けの空と海 */
-    color: #4e342e; /* 濃い茶色 */
+    
+    /* ★修正： 背景を青空のグラデーションに変更 */
+    background: linear-gradient(to bottom, #87CEEB, #FFFFFF); /* 青空(SkyBlue)から白へ */
+    color: #333; /* ★修正： 基本の文字色を変更 */
     min-height: 100vh;
     margin: 0;
     padding: 20px;
@@ -12,18 +14,19 @@ body {
 }
 
 h1 {
-    color: white;
-    text-shadow: 1px 1px 2px #4e342e;
+    /* ★修正： 文字色を変更 */
+    color: #005a9c; /* 濃い青色 */
+    text-shadow: 1px 1px 2px #FFFFFF; /* 影を白に */
 }
 
 p {
-    color: white;
+    color: #333; /* ★修正： 文字色を変更 */
 }
 
 #game-container {
     width: 90%;
     max-width: 600px;
-    background-color: rgba(255, 255, 255, 0.9); /* 白い門（鳥居）をイメージ */
+    background-color: rgba(255, 255, 255, 0.9);
     border: 5px solid white;
     border-radius: 10px;
     padding: 20px;
@@ -61,7 +64,8 @@ p {
     padding: 20px;
     text-align: center;
     background-color: white;
-    border: 2px solid #f57c00;
+    /* ★修正： 枠線の色を変更 */
+    border: 2px solid #87CEEB;
     border-radius: 10px;
 }
 #back-to-map {

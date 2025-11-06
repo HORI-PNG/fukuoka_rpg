@@ -20,7 +20,12 @@ export class GameScene extends Phaser.Scene {
 
         // 訪問済スポットの色を定義
         const visitedColor = 0xffaaaa; // 薄い赤色
-        const defaultColor = 0xfffcc; // 薄い黄色
+
+        // 新しい色の定義
+        const friendlyColor = 0xd0e43b; // スマホ向き
+        const complexColor = 0x67afe3;  // スマホ不向き
+        const hobbyColor = 0x8c4bf5;   // 趣味・その他
+
 
         // 現在のプレイヤーの訪問履歴を取得
         const currentPlayer = window.gameApi.getCurrentPlayer();
@@ -32,8 +37,24 @@ export class GameScene extends Phaser.Scene {
             // スポットごとに個別のGraphicsオブジェクトを作成
             const spotGraphic = this.add.graphics();
             spotGraphic.setDepth(1); // プレイヤーより後ろ、マップより前に配置
+
+            // ここから色分けロジックを変更
+            let spotColor;
             const isVisited = visitedSpots.includes(spot.name);
-            const spotColor = isVisited ? visitedColor : defaultColor;
+
+            if (isVisited) {
+                spotColor = visitedColor; // 訪問済みは赤
+            } else {
+                // spot.mobileFriendly が false なら青、それ以外（trueまたは未定義）なら緑
+                if (spot.mobileFriendly === false) {
+                    spotColor = complexColor; // スマホ不向き
+                } else if (spot.mobileFriendly === true) {
+                    spotColor = friendlyColor; // スマホ向き
+                } else {
+                    spotColor = hobbyColor; // 趣味・その他
+                }
+            }
+            
             spotGraphic.fillStyle(spotColor, 0.5); // 50%で透過
             const drawX = spot.x - spot.width / 2;
             const drawY = spot.y - spot.height / 2;
@@ -47,6 +68,7 @@ export class GameScene extends Phaser.Scene {
             spotObject.reward = spot.reward;
             spotObject.url = spot.url;
             spotObject.type = spot.type;
+            spotObject.mobileFriendly = spot.mobileFriendly; // ★追加： 情報を引き継ぐ
 
             // 作成した Graphics を spotObject に関連付けておく (後で色を変える場合など)
             spotObject.graphic = spotGraphic;
@@ -88,6 +110,10 @@ export class GameScene extends Phaser.Scene {
         if (reward) {
             if (isSuccess) {
                 this.addItem(reward); // Supabase にアイテムを追加
+                // ★追加： スコアも加算
+                if (window.gameApi && typeof window.gameApi.updateScore === 'function') {
+                    window.gameApi.updateScore(1);
+                }
             } else {
                 alert(`残念！「${reward}」は手に入らなかった…。`);
             }
@@ -155,9 +181,9 @@ export class GameScene extends Phaser.Scene {
             this.isEnteringSpot = true;
 
             // スポットの色を即座に変更
-            if (spot.spotGraphic) {
+            if (spot.graphic) { // ★修正： spot.spotGraphic -> spot.graphic
                 const visitedColor = 0xffaaaa; // 薄い赤色
-                spot.spotGraphic.clear(); // 既存の描画をクリア
+                spot.graphic.clear(); // 既存の描画をクリア
                 spot.graphic.fillStyle(visitedColor, 0.5);
                 // create時と同様に、中心座標から描画開始位置を計算
                 const drawX = spot.x - spot.width / 2;
