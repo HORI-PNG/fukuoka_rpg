@@ -41,8 +41,6 @@ canvas {
 #items { display: flex; flex-wrap: wrap; gap: 5px; }
 .item { padding: 5px; background-color: #f0f0f0; border-radius: 3px; }
 
-/* #toggle-items-button { ... } <- 重複していたため削除 */
-
 #controls {
     position: fixed; bottom: 30px; right: 30px; display: flex;
     flex-direction: column; align-items: center; gap: 5px; z-index: 100;
@@ -52,15 +50,6 @@ canvas {
     width: 50px; height: 50px; font-size: 24px; color: #333;
     background-color: rgba(255, 255, 255, 0.7); border: 2px solid #555;
     border-radius: 50%; cursor: pointer; user-select: none;
-}
-
-#bgm-toggle-button {
-    /* 画面の右上に配置 */
-    top: 30px;
-    right: 30px;
-    /* bottom, left の指定を上書き */
-    bottom: auto;
-    left: auto;
 }
 
 #toggle-items-button {
@@ -159,47 +148,9 @@ canvas {
 }
 
 /* ゲーム中の情報表示 */
-#game-info {
-    background-color: rgba(0, 0, 0, 0.7); /* 背景を濃い半透明に */
-    color: white; 
-    border: 4px solid #d4a373; 
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5); /* 影を付けて立体感を出す */
-    text-shadow: 2px 2px #333; /* 文字に影を付けて読みやすく */
-    padding: 15px 25px;
-    display: none; /* 初期状態では非表示 */
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 10px 20px;
-    border-radius: 10px;
-    z-index: 100;
-}
 #game-container {
     position: relative;
     z-index: 10;
-}
-
-#special-stage-area {
-    margin: 15px 0;
-}
-
-#special-stage-button {
-    padding: 12px 28px;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: white;
-    background: linear-gradient(45deg, #ff00ff, #00ffff);
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s;
-}
-
-#special-stage-button:hover {
-    transform: scale(1.1);
 }
 
 #show-map-button {
@@ -220,16 +171,6 @@ canvas {
     background-color: rgba(130, 190, 255, 1); 
 }
 
-.game-reset-button {
-    display: block;
-    margin: 15px auto;
-    padding: 8px 16px;
-    background-color: #f44336; /* 赤色 */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
 .game-reset-button:hover {
     background-color: #d32f2f;
 }
