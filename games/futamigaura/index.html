@@ -2,24 +2,31 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>二見ヶ浦 - SAOクイズ</title>
+    <title>二見ヶ浦の夫婦岩 - パズル</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>二見ヶ浦 ～完全趣味SAOクイズ～</h1>
-    <p>キリトの記憶が試される...！SAOアリシゼーション編クイズに挑戦しよう！</p>
+    <h1>二見ヶ浦の夫婦岩 パズル</h1>
+    <p>下のピースをドラッグ＆ドロップして、二見ヶ浦の夫婦岩を完成させよう！</p>
 
-    <div id="game-container">
-        <div id="story-text">
-            </div>
-        <div id="choices-container">
-            </div>
+    <div id="puzzle-board">
+        <div class="puzzle-slot" data-index="0"></div>
+        <div class="puzzle-slot" data-index="1"></div>
+        <div class="puzzle-slot" data-index="2"></div>
+        <div class="puzzle-slot" data-index="3"></div>
+        <div class="puzzle-slot" data-index="4"></div>
+        <div class="puzzle-slot" data-index="5"></div>
+        <div class="puzzle-slot" data-index="6"></div>
+        <div class="puzzle-slot" data-index="7"></div>
+        <div class="puzzle-slot" data-index="8"></div>
     </div>
 
+    <div id="piece-container">
+        </div>
+
+
     <div class="result-area" style="display: none;">
-        <h2>全問正解！</h2>
+        <h2>完成！</h2>
         <p>「縁結びのお守り」を手に入れた！</p>
         <button id="back-to-map">マップに戻る</button>
     </div>

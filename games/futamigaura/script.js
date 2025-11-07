@@ -1,101 +1,109 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const storyText = document.getElementById('story-text');
-    const choicesContainer = document.getElementById('choices-container');
+    const pieceContainer = document.getElementById('piece-container');
+    const puzzleBoard = document.getElementById('puzzle-board');
+    const slots = document.querySelectorAll('.puzzle-slot');
     const resultArea = document.querySelector('.result-area');
     const backButton = document.getElementById('back-to-map');
 
-    const quizData = [
-        {
-            question: '問1：アリスやユージオ達が暮らしていた村の名前は？',
-            choices: [
-                { text: 'ルーリッド', correct: true },
-                { text: 'ザッカリア', correct: false },
-                { text: 'セントリア', correct: false },
-            ]
-        },
-        {
-            question: '問2：ノーランガルス帝立修剣学院主席ウォロ・リーバンテインは何流剣術の使い手だったか？',
-            choices: [
-                { text: 'ハイ・ノルキア流', correct: true },
-                { text: 'アインクラッド流', correct: false },
-                { text: 'セラルート流', correct: false },
-            ]
-        },
-        {
-            question: '問3：右目の封印「システム・アラート」のコードナンバーは？',
-            choices: [
-                { text: 'Code 871', correct: true },
-                { text: 'Code 823', correct: false },
-                { text: 'Code 812', correct: false },
-            ]
-        },
-        {
-            question: '問4：アリスとキリト・ユージオが剣を交えたのは、セントラルカセドラルの何階？',
-            choices: [
-                { text: '75階', correct: false },
-                { text: '80階', correct: true },
-                { text: '85階', correct: false },
-            ]
-        },
-        {
-            question: '問5：キリトがソルティリーナの卒業祝いに送った花の名前は？',
-            choices: [
-                { text: 'ゼフィリア', correct: true },
-                { text: 'カトレア', correct: false },
-                { text: 'シノグロッサム', correct: false },
-            ]
-        }
-    ];
+    const TOTAL_PIECES = 9;
+    let correctPieces = 0;
 
-    let currentQuestionIndex = 0; // 現在の問題番号
+    let selectedPiece = null; // ★変更： 現在選択中のピース
 
-    function showQuestion(index) {
+    // スロットの座標計算は不要になりました
+    
+    // ピースをシャッフルして配置
+    function initializePieces() {
+        let pieceIndexes = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        pieceIndexes.sort(() => Math.random() - 0.5);
         
-        // 全問正解した場合 (indexが5になったら)
-        if (index >= quizData.length) {
-            storyText.innerHTML = "全問正解！<br>おめでとう！";
-            choicesContainer.innerHTML = ''; // 選択肢を消す
-            setTimeout(() => {
-                document.getElementById('game-container').style.display = 'none';
-                resultArea.style.display = 'block';
-            }, 2000);
-            return; // 関数を終了
-        }
+        pieceIndexes.forEach((index, i) => {
+            const piece = document.createElement('div');
+            piece.className = `puzzle-piece piece-${index}`;
+            piece.dataset.index = index;
+            
+            // ピース置き場の中での初期位置
+            const row = Math.floor(i / 3);
+            const col = i % 3;
+            const x = (col * 155) + 10; // 150(幅) + 5(隙間)
+            const y = (row * 95) + 10;  // 90(高さ) + 5(隙間)
+            
+            piece.style.left = `${x}px`;
+            piece.style.top = `${y}px`;
 
-        const scene = quizData[index];
-        
-        storyText.innerHTML = scene.question.replace(/\n/g, '<br>');
-        choicesContainer.innerHTML = '';
-
-        // --- 選択肢の表示 ---
-        // 選択肢をシャッフルして表示
-        const shuffledChoices = [...scene.choices].sort(() => Math.random() - 0.5);
-
-        shuffledChoices.forEach(choice => {
-            const button = document.createElement('button');
-            button.textContent = choice.text;
-            button.addEventListener('click', () => {
+            // ★修正： ピースのクリック（タップ）処理
+            piece.addEventListener('pointerdown', (e) => {
+                e.preventDefault(); // スクロールやダブルタップズームを防ぐ
                 
-                if (choice.correct === true) {
-                    // ★正解なら、次の問題へ
-                    alert('正解！');
-                    currentQuestionIndex++;
-                    showQuestion(currentQuestionIndex);
-                } else {
-                    // ★不正解なら、リロード（やり直し）
-                    alert('不正解...。最初からやり直し！');
-                    window.location.reload();
+                // 既に選択中のピースがあり、それが自分自身なら選択解除
+                if (selectedPiece === piece) {
+                    selectedPiece.classList.remove('dragging'); // 'dragging' スタイルを選択中として流用
+                    selectedPiece = null;
+                } 
+                // 選択中のピースがなく、まだスナップされていないピースなら選択
+                else if (!selectedPiece && !piece.classList.contains('snapped')) {
+                    // もし他のピースが選択されていたら、それを解除
+                    if (selectedPiece) {
+                        selectedPiece.classList.remove('dragging');
+                    }
+                    selectedPiece = piece;
+                    selectedPiece.classList.add('dragging'); // 選択中スタイル
                 }
             });
-            choicesContainer.appendChild(button);
+            
+            pieceContainer.appendChild(piece);
         });
     }
 
-    // マップに戻るボタンの処理 (報酬名は元のままです)
+    // --- スロットのクリック（タップ）処理 ---
+    slots.forEach(slot => {
+        slot.addEventListener('pointerdown', (e) => {
+            e.preventDefault(); // スクロールやダブルタップズームを防ぐ
+            
+            // ピースが選択されていないか、スロットが既に埋まっている場合は何もしない
+            if (!selectedPiece || slot.hasChildNodes()) {
+                // 選択中のピースがある場合、スロットをタップしたら選択解除
+                if(selectedPiece) {
+                    selectedPiece.classList.remove('dragging');
+                    selectedPiece = null;
+                }
+                return;
+            }
+
+            const slotIndex = slot.dataset.index;
+            const pieceIndex = selectedPiece.dataset.index;
+
+            // 正しい場所にドロップされたか判定
+            if (pieceIndex === slotIndex) {
+                // 正解
+                slot.appendChild(selectedPiece); // スロットにピースを入れる
+                selectedPiece.classList.remove('dragging');
+                selectedPiece.classList.add('snapped'); // スナップ済みクラスを追加
+                selectedPiece.style.left = '0'; // スロット内の(0,0)に配置
+                selectedPiece.style.top = '0';
+                
+                correctPieces++;
+                selectedPiece = null; // 選択解除
+                
+                if (correctPieces === TOTAL_PIECES) {
+                    showResult();
+                }
+            } else {
+                // 不正解
+                alert('場所が違います！');
+                selectedPiece.classList.remove('dragging');
+                selectedPiece = null; // 選択解除
+            }
+        });
+    });
+
+    function showResult() {
+        resultArea.style.display = 'block';
+    }
+
     backButton.addEventListener('click', () => {
         window.location.href = '../../index.html?reward=縁結びのお守り&success=true';
     });
-
-    // ゲーム開始 (最初の問題を表示)
-    showQuestion(currentQuestionIndex);
+    
+    initializePieces(); // ピースを配置
 });

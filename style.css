@@ -2,7 +2,6 @@
 
 body {
     font-family: 'DotGothic16', sans-serif; /* フォントを変更 */
-    /* font-family: sans-serif; <- 重複していたため削除 */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -54,10 +53,14 @@ canvas {
 
 #toggle-items-button {
     position: fixed; bottom: 30px; 
-    left: 210px; 
-    width: 60px; height: 60px;
-    font-size: 2em; background-color: rgba(255, 255, 255, 0.8);
+    left: 180px; 
+    width: 40px; height: 40px;
+    font-size: 1.5em; background-color: rgba(255, 255, 255, 0.8);
     border: 2px solid #555; border-radius: 50%; cursor: pointer; z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
 }
 
 #controls button:active {
@@ -96,9 +99,9 @@ canvas {
 }
 
 #reset-button {
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
     background-color: rgba(255, 182, 193, 0.8); 
     border: 2px solid #b22222; 
     border-radius: 50%;
@@ -114,9 +117,9 @@ canvas {
 }
 
 #delete-data-button {
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
     background-color: rgba(255, 182, 193, 0.8); 
     border: 2px solid #b22222; 
     border-radius: 50%;
@@ -154,9 +157,9 @@ canvas {
 }
 
 #show-map-button {
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
     background-color: rgba(182, 219, 255, 0.8); /* 他のボタンと色を変える（水色） */
     border: 2px solid #005a9c; 
     border-radius: 50%;

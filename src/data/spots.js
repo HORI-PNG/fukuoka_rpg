@@ -34,7 +34,7 @@ export const spots = [
         height: 100,
         url: './games/futamigaura/index.html',
         reward: '縁結びのお守り',
-        // SAOの問題にしたいので、true・falseは無し
+        mobileFriendly: true
     },
     {
         name: '柳川の川下り',
